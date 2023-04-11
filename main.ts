@@ -1,8 +1,11 @@
 import express from "express";
 import dotenv from "dotenv";
+import { connectDB } from "./db";
 
 // import env variables
 dotenv.config();
+
+connectDB(process.env.MONGO_URL || "");
 
 // create app with middleware
 const app = express();
@@ -18,5 +21,5 @@ app.route("/").get((_, res) => {
 
 // run server
 app.listen(PORT, () => {
-  console.log("Running on http://localhost:" + PORT);
+  console.log(`Server running on ${PORT}!`);
 });
