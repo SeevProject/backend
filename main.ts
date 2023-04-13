@@ -5,6 +5,7 @@ import { connectDB } from "./db";
 // import env variables
 dotenv.config();
 
+// this will connect to the database
 connectDB(process.env.MONGO_URL || "");
 
 // create app with middleware
@@ -16,10 +17,10 @@ const PORT = process.env.PORT || 3000;
 
 // example route
 app.route("/").get((_, res) => {
-  res.send("Hello");
+	res.send("Hello");
 });
 
 // run server
 app.listen(PORT, () => {
-  console.log(`Server running on ${PORT}!`);
+	console.log(`Server running on ${PORT}!`);
 });
