@@ -1,6 +1,15 @@
 import { Router } from "express";
-import { getAllTemplates } from "../controllers/templates.controller";
+import {
+	addTemplate,
+	deleteTemplate,
+	getAllTemplates,
+	updateTemplate,
+} from "../controllers/templates.controller";
 
-export const usersRouter = Router();
+export const templatesRouter = Router();
 
-usersRouter.get("/", getAllTemplates);
+templatesRouter
+	.get("/", getAllTemplates)
+	.post("/", addTemplate)
+	.put("/:id", updateTemplate)
+	.delete("/:id", deleteTemplate);

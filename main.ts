@@ -4,6 +4,9 @@ import { connectDB } from "./db";
 import cors from "cors";
 import helmet from "helmet";
 import { usersRouter } from "./routers/users.router";
+import { templatesRouter } from "./routers/templates.router";
+import { authRouter } from "./routers/auth.router";
+import { companiesRouter } from "./routers/companies.router";
 
 // import env variables
 dotenv.config();
@@ -29,18 +32,21 @@ app.use(
 	})
 );
 
-// use server port or 3000
+// set server port
 const PORT = process.env.PORT || 3000;
 
 // add routers to app
 app.use("/users", usersRouter);
+app.use("/templates", templatesRouter);
+app.use("/auth", authRouter);
+app.use("/companies", companiesRouter);
 
 // all other routes will return 404
 app.all("*", (_, res) => {
 	return res.status(404).send("Not Found");
 });
 
-// run server
+// serve app
 app.listen(PORT, () => {
 	console.log(`Server running on ${PORT}!`);
 });

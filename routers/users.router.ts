@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
-	createUserCV,
+	generateCV,
+	getAllUsers,
 	getUserData,
 	updateUserData,
 } from "../controllers/users.controller";
@@ -8,7 +9,7 @@ import {
 export const usersRouter = Router();
 
 usersRouter
-	.get("/")
+	.get("/", getAllUsers)
 	.get("/me", getUserData)
 	.put("/me", updateUserData)
-	.post("/me/generate", createUserCV);
+	.post("/me/generate", generateCV);

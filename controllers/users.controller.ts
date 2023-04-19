@@ -9,9 +9,9 @@ export async function getUserData(_, res: Response) {
 }
 
 export async function updateUserData(_, res: Response) {
-	return res.send("Hello");
+	return res.send("updating user data");
 }
 
-export async function createUserCV(_, res: Response) {
-	return res.send("Hello");
+export async function generateCV(_, res: Response) {
+	return res.send("generating cv");
 }
