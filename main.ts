@@ -1,6 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
-import { connectDB } from "./db";
+import { connectDB } from "./utils/db";
 import cors from "cors";
 import helmet from "helmet";
 import { usersRouter } from "./routers/users.router";
@@ -54,7 +54,7 @@ app.use(
 			maxAge: 1000 * 60 * 60 * 24 * 3,
 			// secure: true,
 		},
-	})
+	}),
 );
 
 // set server port
