@@ -1,4 +1,4 @@
-import { firebaseAdmin } from "../utils/auth";
+import { firebaseAdmin } from "../utils/firebase";
 import { Request, Response } from "express";
 import { isError, result } from "../utils/error";
 
@@ -30,10 +30,6 @@ export async function register(req: Request, res: Response) {
 }
 
 export async function logout(req: Request, res: Response) {
-	// if user is not logged in, return error
-	if (!req.session.uid)
-		return res.status(400).json({ message: "not logged in" });
-
 	// delete session for user
 	req.session.destroy((err) => {
 		if (err) return res.status(500).json({ message: "error logging out" });

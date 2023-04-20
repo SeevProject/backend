@@ -1,6 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
-import { connectDB } from "./utils/db";
+import { connectDB } from "./utils/mongo";
 import cors from "cors";
 import helmet from "helmet";
 import { usersRouter } from "./routers/users.router";
