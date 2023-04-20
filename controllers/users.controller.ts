@@ -1,6 +1,9 @@
 import { Request, Response } from "express";
 
-export async function getAllUsers(_, res: Response) {
+export async function getAllUsers(req: Request, res: Response) {
+	// test reading session
+	console.log(req.session);
+
 	return res.send(["user1", "user2"]);
 }
 

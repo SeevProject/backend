@@ -7,6 +7,14 @@ import { usersRouter } from "./routers/users.router";
 import { templatesRouter } from "./routers/templates.router";
 import { authRouter } from "./routers/auth.router";
 import { companiesRouter } from "./routers/companies.router";
+import mongoStore from "connect-mongo";
+import session from "express-session";
+
+declare module "express-session" {
+	interface SessionData {
+		username: string;
+	}
+}
 
 // import env variables
 dotenv.config();
@@ -26,9 +34,26 @@ app.use(
 	helmet(),
 	// cors for cross origin
 	cors({
+		credentials: true,
 		// TODO change to domain later
 		origin: "*",
 		methods: ["GET", "POST", "PUT", "DELETE"],
+	}),
+	// session for cookies
+	session({
+		secret: "hello",
+		saveUninitialized: false,
+		resave: false,
+		store: mongoStore.create({
+			mongoUrl: process.env.MONGO_URL || "",
+			dbName: "testing",
+		}),
+		cookie: {
+			httpOnly: true,
+			sameSite: "lax",
+			maxAge: 1000 * 60 * 60 * 24 * 3,
+			// secure: true,
+		},
 	})
 );
 
