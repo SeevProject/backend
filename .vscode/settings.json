@@ -1,0 +1,10 @@
+{
+  "prettier.useTabs": true,
+  "prettier.trailingComma": "all",
+  "prettier.semi": true,
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": true,
+  "files.autoSave": "afterDelay",
+  "prettier.tabWidth": 2,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+}
