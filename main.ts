@@ -9,6 +9,7 @@ import { authRouter } from "./routers/auth.router";
 import { companiesRouter } from "./routers/companies.router";
 import mongoStore from "connect-mongo";
 import session from "express-session";
+import { requiresAuth } from "./middleware/auth.middleware";
 
 declare module "express-session" {
 	interface SessionData {
@@ -61,10 +62,11 @@ app.use(
 const PORT = process.env.PORT || 3000;
 
 // add routers to app
-app.use("/users", usersRouter);
-app.use("/templates", templatesRouter);
+// all require auth except auth itself
 app.use("/auth", authRouter);
-app.use("/companies", companiesRouter);
+app.use("/users", requiresAuth, usersRouter);
+app.use("/templates", requiresAuth, templatesRouter);
+app.use("/companies", requiresAuth, companiesRouter);
 
 // all other routes will return 404
 app.all("*", (_, res) => {
