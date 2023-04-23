@@ -1,10 +1,14 @@
 {
-  "prettier.useTabs": true,
-  "prettier.trailingComma": "all",
-  "prettier.semi": true,
-  "editor.formatOnSave": true,
-  "editor.formatOnPaste": true,
-  "files.autoSave": "afterDelay",
-  "prettier.tabWidth": 2,
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
+	"prettier.useTabs": true,
+	"prettier.trailingComma": "all",
+	"prettier.semi": true,
+	"editor.formatOnSave": true,
+	"editor.formatOnPaste": true,
+	"editor.autoIndent": "full",
+	"editor.detectIndentation": true,
+	"editor.insertSpaces": false,
+	"editor.comments.insertSpace": true,
+	"files.autoSave": "afterDelay",
+	"prettier.tabWidth": 2,
+	"editor.defaultFormatter": "esbenp.prettier-vscode"
 }

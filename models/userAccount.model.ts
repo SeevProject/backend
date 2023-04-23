@@ -27,12 +27,12 @@ const userAccountSchema = new Schema<UserAccount>({
 	},
 	data: {
 		name: {
-			first: { type: String, required: true },
+			first: { type: String, required: false },
 			middle: { type: String, required: false },
-			last: { type: String, required: true },
+			last: { type: String, required: false },
 		},
-		phone: { type: String, required: true },
-		email: { type: String, required: true },
+		phone: { type: String, required: false },
+		email: { type: String, required: false },
 		picture: { type: String, required: false },
 		about: { type: String, required: false },
 	},
