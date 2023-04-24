@@ -1,25 +1,16 @@
 import { firebaseAdmin } from "../utils/firebase";
-import { Request, Response } from "express";
 import { isError, result } from "../utils/error";
 import { userAccountModel } from "../models/userAccount.model";
+import { RequestExt, ResponseExt } from "../utils/types";
 
-export async function login(req: Request, res: Response) {
-	// get jwt token from client
-	const jwtToken = req.headers.authorization?.split(" ")[1];
+export async function login(req: RequestExt, res: ResponseExt) {
+	// token data is already added to the request by the previous middleware
+	const tokenData = req.tokenData;
 
-	// if no token, return error
-	if (!jwtToken) return res.status(401).json({ message: "No token provided" });
-
-	// verify token using firebase auth
-	const tokenData = await result(firebaseAdmin.auth().verifyIdToken(jwtToken));
-
-	// if token is invalid, return error
-	if (isError(tokenData))
-		return res.status(401).json({ message: "Your token is invalid" });
-
+	// try to find user account in database
 	const userAccount = await result(
 		userAccountModel.findOne({
-			uid: tokenData.uid,
+			uid: tokenData?.uid,
 		}),
 	);
 
@@ -35,30 +26,20 @@ export async function login(req: Request, res: Response) {
 			.status(401)
 			.json({ message: "You do not have an account to login to" });
 
-	// otherwise create session for user and store uid
-	req.session.uid = tokenData.uid;
+	// finally create session using uid retrieved from database
+	req.session.uid = userAccount.uid;
 
 	return res.status(200).json({ message: "successfully logged user in" });
 }
 
-export async function register(req: Request, res: Response) {
-	// get jwt token from client
-	const jwtToken = req.headers.authorization?.split(" ")[1];
-
-	// if no token, return error
-	if (!jwtToken) return res.status(401).json({ message: "No token provided" });
-
-	// verify token using firebase auth
-	const tokenData = await result(firebaseAdmin.auth().verifyIdToken(jwtToken));
-
-	// if token is invalid, return error
-	if (isError(tokenData))
-		return res.status(401).json({ message: "Your token is invalid" });
+export async function register(req: RequestExt, res: ResponseExt) {
+	// token data is already added to the request by the previous middleware
+	const tokenData = req.tokenData;
 
 	// try to find user account in database
 	const userAccount = await result(
 		userAccountModel.findOne({
-			uid: tokenData.uid,
+			uid: tokenData?.uid,
 		}),
 	);
 
@@ -81,7 +62,7 @@ export async function register(req: Request, res: Response) {
 	const createdUserAccount = await result(
 		userAccountModel.create({
 			username,
-			uid: tokenData.uid,
+			uid: tokenData?.uid,
 			createdAt: new Date().toString(),
 			type: "user",
 			data: {},
@@ -94,13 +75,13 @@ export async function register(req: Request, res: Response) {
 			.status(401)
 			.json({ message: "Could not create your account in db" });
 
-	// create session for user and store uid
-	req.session.uid = tokenData.uid;
+	// finally create session using uid retrieved from database
+	req.session.uid = createdUserAccount.uid;
 
 	return res.send("successfully registered user");
 }
 
-export async function logout(req: Request, res: Response) {
+export async function logout(req: RequestExt, res: ResponseExt) {
 	// delete session for user
 	req.session.destroy((err) => {
 		if (err) return res.status(500).json({ message: "error logging out" });

@@ -1,17 +1,17 @@
-import { Request, Response } from "express";
+import { ResponseExt } from "../utils/types";
 
-export async function getAllTemplates(_, res: Response) {
+export async function getAllTemplates(_, res: ResponseExt) {
 	return res.send(["template1", "template2"]);
 }
 
-export async function addTemplate(_, res: Response) {
+export async function addTemplate(_, res: ResponseExt) {
 	return res.send("adding template");
 }
 
-export async function updateTemplate(_, res: Response) {
+export async function updateTemplate(_, res: ResponseExt) {
 	return res.send("updating template");
 }
 
-export async function deleteTemplate(_, res: Response) {
+export async function deleteTemplate(_, res: ResponseExt) {
 	return res.send("deleting template");
 }
