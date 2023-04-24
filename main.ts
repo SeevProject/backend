@@ -12,13 +12,6 @@ import session from "express-session";
 import { requiresAuth } from "./middleware/auth.middleware";
 import { rateLimit } from "express-rate-limit";
 
-// declare data that will be stored in session
-declare module "express-session" {
-	interface SessionData {
-		uid: string;
-	}
-}
-
 // import env variables
 dotenv.config();
 
