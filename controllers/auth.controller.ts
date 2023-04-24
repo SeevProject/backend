@@ -7,6 +7,9 @@ export async function login(req: Request, res: Response) {
 	// get jwt token from client
 	const jwtToken = req.headers.authorization?.split(" ")[1];
 
+	// if no token, return error
+	if (!jwtToken) return res.status(401).json({ message: "No token provided" });
+
 	// verify token using firebase auth
 	const tokenData = await result(firebaseAdmin.auth().verifyIdToken(jwtToken));
 
@@ -41,6 +44,9 @@ export async function login(req: Request, res: Response) {
 export async function register(req: Request, res: Response) {
 	// get jwt token from client
 	const jwtToken = req.headers.authorization?.split(" ")[1];
+
+	// if no token, return error
+	if (!jwtToken) return res.status(401).json({ message: "No token provided" });
 
 	// verify token using firebase auth
 	const tokenData = await result(firebaseAdmin.auth().verifyIdToken(jwtToken));
