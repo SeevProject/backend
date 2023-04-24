@@ -10,6 +10,7 @@ import { companiesRouter } from "./routers/companies.router";
 import mongoStore from "connect-mongo";
 import session from "express-session";
 import { requiresAuth } from "./middleware/auth.middleware";
+import { rateLimit } from "express-rate-limit";
 
 declare module "express-session" {
 	interface SessionData {
@@ -31,8 +32,10 @@ app.use(
 	// json and url encoding
 	express.json(),
 	express.urlencoded({ extended: false }),
+
 	// helmet for security
 	helmet(),
+
 	// cors for cross origin
 	cors({
 		credentials: true,
@@ -40,6 +43,16 @@ app.use(
 		origin: "*",
 		methods: ["GET", "POST", "PUT", "DELETE"],
 	}),
+
+	// setup rate limiter for requests
+	rateLimit({
+		max: 100, // limit each IP to 100 requests
+		windowMs: 5 * 60 * 1000, // per 15 minutes
+		standardHeaders: true,
+		legacyHeaders: false,
+		message: "Too many requests from this IP",
+	}),
+
 	// session for cookies
 	session({
 		secret: "hello",

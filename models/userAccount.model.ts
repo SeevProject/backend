@@ -1,4 +1,4 @@
-import { Schema, model, Document } from "mongoose";
+import { Schema } from "mongoose";
 import { Account, accountModel } from "./account.model";
 
 // define schema
