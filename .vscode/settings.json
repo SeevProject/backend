@@ -10,5 +10,5 @@
 	"editor.comments.insertSpace": true,
 	"files.autoSave": "afterDelay",
 	"prettier.tabWidth": 2,
-	"editor.defaultFormatter": "esbenp.prettier-vscode"
+	"editor.defaultFormatter": "esbenp.prettier-vscode",
 }

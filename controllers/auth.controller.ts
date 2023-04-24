@@ -9,10 +9,10 @@ export async function login(req: Request, res: Response) {
 		return res.status(400).json({ message: "already logged in" });
 
 	// get jwt token from client
-	const jwtToken = req.headers.authorization!.split(" ")[1];
+	const jwtToken = req.headers.authorization?.split(" ")[1];
 
 	// verify token using firebase auth
-	let tokenData = await result(firebaseAdmin.auth().verifyIdToken(jwtToken));
+	const tokenData = await result(firebaseAdmin.auth().verifyIdToken(jwtToken));
 
 	// if token is invalid, return error
 	if (isError(tokenData))
@@ -44,10 +44,10 @@ export async function login(req: Request, res: Response) {
 
 export async function register(req: Request, res: Response) {
 	// get jwt token from client
-	const jwtToken = req.headers.authorization!.split(" ")[1];
+	const jwtToken = req.headers.authorization?.split(" ")[1];
 
 	// verify token using firebase auth
-	let tokenData = await result(firebaseAdmin.auth().verifyIdToken(jwtToken));
+	const tokenData = await result(firebaseAdmin.auth().verifyIdToken(jwtToken));
 
 	// if token is invalid, return error
 	if (isError(tokenData))
