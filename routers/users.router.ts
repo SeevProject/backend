@@ -8,6 +8,8 @@ import {
 
 export const usersRouter = Router();
 
+// all routes require a session
+
 usersRouter
 	.get("/", getAllUsers)
 	.get("/me", getUserData)

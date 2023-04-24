@@ -8,6 +8,8 @@ import {
 
 export const templatesRouter = Router();
 
+// all routes require a session
+
 templatesRouter
 	.get("/", getAllTemplates)
 	.post("/", addTemplate)

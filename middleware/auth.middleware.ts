@@ -28,8 +28,8 @@ export async function requiresToken(
 	next();
 }
 
-// middlware that forbids non authenticated requests
-export function requiresAuth(
+// middlware that forbids non authenticated requests (requests without session)
+export function requiresSession(
 	req: RequestExt,
 	res: ResponseExt,
 	next: NextFunction,
@@ -40,8 +40,8 @@ export function requiresAuth(
 	next();
 }
 
-// middleware that forbids authenticated requests
-export function requiresNoAuth(
+// middlware that forbids authenticated requests (requests with session)
+export function requiresNoSession(
 	req: RequestExt,
 	res: ResponseExt,
 	next: NextFunction,

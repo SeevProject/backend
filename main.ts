@@ -9,7 +9,7 @@ import { authRouter } from "./routers/auth.router";
 import { companiesRouter } from "./routers/companies.router";
 import mongoStore from "connect-mongo";
 import session from "express-session";
-import { requiresAuth } from "./middleware/auth.middleware";
+import { requiresSession } from "./middleware/auth.middleware";
 import { rateLimit } from "express-rate-limit";
 
 // import env variables
@@ -71,9 +71,9 @@ const PORT = process.env.PORT || 3000;
 // add routers to app
 // all require auth except auth itself
 app.use("/auth", authRouter);
-app.use("/users", requiresAuth, usersRouter);
-app.use("/templates", requiresAuth, templatesRouter);
-app.use("/companies", requiresAuth, companiesRouter);
+app.use("/users", requiresSession, usersRouter);
+app.use("/templates", requiresSession, templatesRouter);
+app.use("/companies", requiresSession, companiesRouter);
 
 // all other routes will return 404
 app.all("*", (_, res) => {

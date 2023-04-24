@@ -9,6 +9,8 @@ import {
 
 export const companiesRouter = Router();
 
+// all routes require a session
+
 companiesRouter
 	.get("/", getAllCompanies)
 	.post("/", addCompany)
