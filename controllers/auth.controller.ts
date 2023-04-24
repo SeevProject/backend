@@ -4,10 +4,6 @@ import { isError, result } from "../utils/error";
 import { userAccountModel } from "../models/userAccount.model";
 
 export async function login(req: Request, res: Response) {
-	// if user is already logged in, return error
-	if (req.session.uid)
-		return res.status(400).json({ message: "already logged in" });
-
 	// get jwt token from client
 	const jwtToken = req.headers.authorization?.split(" ")[1];
 
@@ -88,7 +84,9 @@ export async function register(req: Request, res: Response) {
 
 	// if could not create user account, return error
 	if (isError(createdUserAccount))
-		return res.status(401).json({ message: "Could not create your account in db" });
+		return res
+			.status(401)
+			.json({ message: "Could not create your account in db" });
 
 	// create session for user and store uid
 	req.session.uid = tokenData.uid;
