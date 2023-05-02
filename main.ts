@@ -71,9 +71,9 @@ const PORT = process.env.PORT || 3000;
 // add routers to app
 // all require auth except auth itself
 app.use("/auth", authRouter);
-app.use("/users", requiresSession, usersRouter);
-app.use("/templates", requiresSession, templatesRouter);
-app.use("/companies", requiresSession, companiesRouter);
+app.use("/users", usersRouter);
+app.use("/templates", templatesRouter);
+app.use("/companies", companiesRouter);
 
 // all other routes will return 404
 app.all("*", (_, res) => {

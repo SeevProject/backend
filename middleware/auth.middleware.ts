@@ -2,6 +2,7 @@ import { NextFunction } from "express";
 import { isError, result } from "../utils/error";
 import { firebaseAdmin } from "../utils/firebase";
 import { RequestExt, ResponseExt } from "../utils/types";
+import { adminAccountModel } from "../models/adminAccount.model";
 
 // middlware that forbids anyone without a google auth token from accessing
 export async function requiresToken(
@@ -48,6 +49,32 @@ export function requiresNoSession(
 ) {
 	if (req.session.uid)
 		return res.status(400).json({ message: "already logged in" });
+
+	next();
+}
+
+// middlware that forbids non admins
+export async function requiresAdmin(
+	req: RequestExt,
+	res: ResponseExt,
+	next: NextFunction,
+) {
+	// try to find admin account with session uid
+	const adminAccount = await result(
+		adminAccountModel.findOne({
+			uid: req.session.uid,
+		}),
+	);
+
+	// if got error while finding account, return error
+	if (isError(adminAccount))
+		return res
+			.status(401)
+			.json({ message: "Could not try to find if you are an admin" });
+
+	// if the account is not an admin, return error
+	if (!adminAccount)
+		return res.status(401).json({ message: "You're not an admin" });
 
 	next();
 }

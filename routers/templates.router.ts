@@ -5,13 +5,14 @@ import {
 	getAllTemplates,
 	updateTemplate,
 } from "../controllers/templates.controller";
+import { requiresAdmin, requiresSession } from "../middleware/auth.middleware";
 
 export const templatesRouter = Router();
 
 // all routes require a session
 
 templatesRouter
-	.get("/", getAllTemplates)
-	.post("/", addTemplate)
-	.put("/:id", updateTemplate)
-	.delete("/:id", deleteTemplate);
+	.get("/", requiresSession, requiresAdmin, getAllTemplates)
+	.post("/", requiresSession, requiresAdmin, addTemplate)
+	.put("/:id", requiresSession, requiresAdmin, updateTemplate)
+	.delete("/:id", requiresSession, requiresAdmin, deleteTemplate);

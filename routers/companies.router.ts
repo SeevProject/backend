@@ -6,14 +6,15 @@ import {
 	getCompanyData,
 	updateCompanyData,
 } from "../controllers/companies.controller";
+import { requiresAdmin, requiresSession } from "../middleware/auth.middleware";
 
 export const companiesRouter = Router();
 
 // all routes require a session
 
 companiesRouter
-	.get("/", getAllCompanies)
-	.post("/", addCompany)
-	.get("/:id", getCompanyData)
-	.put("/:id", updateCompanyData)
-	.delete("/:id", deleteCompany);
+	.get("/:id", requiresSession, getCompanyData)
+	.get("/", requiresSession, requiresAdmin, getAllCompanies)
+	.post("/", requiresSession, requiresAdmin, addCompany)
+	.put("/:id", requiresSession, requiresAdmin, updateCompanyData)
+	.delete("/:id", requiresSession, requiresAdmin, deleteCompany);

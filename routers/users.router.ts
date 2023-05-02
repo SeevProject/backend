@@ -5,13 +5,14 @@ import {
 	getUserData,
 	updateUserData,
 } from "../controllers/users.controller";
+import { requiresAdmin, requiresSession } from "../middleware/auth.middleware";
 
 export const usersRouter = Router();
 
 // all routes require a session
 
 usersRouter
-	.get("/", getAllUsers)
-	.get("/me", getUserData)
-	.put("/me", updateUserData)
-	.post("/me/generate", generateCV);
+	.get("/me", requiresSession, getUserData)
+	.put("/me", requiresSession, updateUserData)
+	.post("/me/generate", requiresSession, generateCV)
+	.get("/", requiresSession, requiresAdmin, getAllUsers);
