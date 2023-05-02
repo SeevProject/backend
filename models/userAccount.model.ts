@@ -5,6 +5,7 @@ import { Account, accountModel } from "./account.model";
 
 export interface UserAccount extends Account {
 	type: "user";
+	cvlist: string[];
 	data: {
 		name: {
 			first: string;
@@ -15,6 +16,42 @@ export interface UserAccount extends Account {
 		email: string;
 		picture: string;
 		about: string;
+		status: {
+			employed: boolean;
+			student: boolean;
+		};
+		address: {
+			country: string;
+			city: string;
+			street: string;
+		};
+		languages: {
+			name: string;
+			level: string;
+		}[];
+		education: {
+			facility: string;
+			location: string;
+			degree_level: string;
+			degree_field: string;
+			date_start: string;
+			date_end: string;
+		}[];
+		courses: {
+			title: string;
+			about: string;
+			subjects: string[];
+			location: string;
+		}[];
+		skills: {
+			name: string;
+			about: string;
+			level: number;
+		}[];
+		hobbies: {
+			name: string;
+			about: string;
+		}[];
 	};
 }
 
@@ -35,6 +72,52 @@ const userAccountSchema = new Schema<UserAccount>({
 		email: { type: String, required: false },
 		picture: { type: String, required: false },
 		about: { type: String, required: false },
+		status: {
+			employed: { type: Boolean, required: false },
+			student: { type: Boolean, required: false },
+		},
+		address: {
+			country: { type: String, required: false },
+			city: { type: String, required: false },
+			street: { type: String, required: false },
+		},
+		languages: [
+			{
+				name: { type: String, required: false },
+				level: { type: String, required: false },
+			},
+		],
+		education: [
+			{
+				facility: { type: String, required: false },
+				location: { type: String, required: false },
+				degree_level: { type: String, required: false },
+				degree_field: { type: String, required: false },
+				date_start: { type: String, required: false },
+				date_end: { type: String, required: false },
+			},
+		],
+		courses: [
+			{
+				title: { type: String, required: false },
+				about: { type: String, required: false },
+				subjects: { type: [String], required: false },
+				location: { type: String, required: false },
+			},
+		],
+		skills: [
+			{
+				name: { type: String, required: false },
+				about: { type: String, required: false },
+				level: { type: Number, required: false },
+			},
+		],
+		hobbies: [
+			{
+				name: { type: String, required: false },
+				about: { type: String, required: false },
+			},
+		],
 	},
 });
 
