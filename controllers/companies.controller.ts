@@ -1,3 +1,4 @@
+import { companyAccountModel } from "../models/companyAccount.model";
 import { RequestExt, ResponseExt } from "../utils/types";
 
 export async function getAllCompanies(req: RequestExt, res: ResponseExt) {
@@ -5,7 +6,12 @@ export async function getAllCompanies(req: RequestExt, res: ResponseExt) {
 }
 
 export async function addCompany(req: RequestExt, res: ResponseExt) {
-	return res.send("adding company");
+	try {
+		const company = await companyAccountModel.create(req.body)
+		res.json({status:"success",data:company})
+	} catch (error) {
+		 res.status(400).json({ status: "error haia", message: error });
+	}
 }
 
 export async function getCompanyData(req: RequestExt, res: ResponseExt) {
