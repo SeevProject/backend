@@ -5,6 +5,7 @@ import { Account, accountModel } from "./account.model";
 
 export interface CompanyAccount extends Account {
 	type: "company";
+	approved: boolean;
 	permissions: {
 		contact: boolean;
 		status: {
@@ -36,6 +37,7 @@ const companyAccountSchema = new Schema<CompanyAccount>({
 		default: "company",
 		required: true,
 	},
+	approved: { type: Boolean, default: false },
 	permissions: [
 		{
 			contact: { type: Boolean, required: false },
