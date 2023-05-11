@@ -1,6 +1,6 @@
 import { Router } from "express";
 import {
-	addCompany,
+	approveCompany as approveCompany,
 	deleteCompany,
 	getAllCompanies,
 	getCompanyData,
@@ -15,6 +15,6 @@ export const companiesRouter = Router();
 companiesRouter
 	.get("/:id", requiresSession, getCompanyData)
 	.get("/", requiresSession, requiresAdmin, getAllCompanies)
-	.post("/", requiresSession, requiresAdmin, addCompany)
+	.post("/", requiresSession, requiresAdmin, approveCompany)
 	.put("/:id", requiresSession, requiresAdmin, updateCompanyData)
 	.delete("/:id", requiresSession, requiresAdmin, deleteCompany);
