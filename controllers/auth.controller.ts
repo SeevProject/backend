@@ -4,6 +4,10 @@ import { userAccountModel } from "../models/userAccount.model";
 import { RequestExt, ResponseExt } from "../utils/types";
 import { companyAccountModel } from "../models/companyAccount.model";
 import { accountModel } from "../models/account.model";
+import {
+	registerValidation,
+	validateRegisterBody,
+} from "../validation/auth.validation";
 
 export async function login(req: RequestExt, res: ResponseExt) {
 	// token data is already added to the request by the previous middleware
@@ -40,101 +44,53 @@ export async function register(req: RequestExt, res: ResponseExt) {
 	// token data is already added to the request by the previous middleware
 	const tokenData = req.tokenData;
 
+	// validate req.body data and return error if not matching
+	const validationResult = registerValidation.safeParse(req.body);
+	if (!validationResult.success)
+		return res.status(400).json({ message: validationResult.error });
+
+	// use validated body data instead of req.body
+	const validBody = validationResult.data;
+
 	// try to find user account in database
-	const userAccount = await result(
-		userAccountModel.findOne({
+	const account = await result(
+		accountModel.findOne({
 			uid: tokenData?.uid,
 		}),
 	);
 
 	// if got error while finding account, return error
-	if (isError(userAccount))
+	if (isError(account))
 		return res
 			.status(401)
 			.json({ message: "Could not try to find if you already got an account" });
 
 	// if user account already exists, return error
-	if (userAccount)
+	if (account)
 		return res
 			.status(401)
 			.json({ message: "You already got an account, cannot make another" });
 
-	// TODO use request data
-	const username = "Carmack";
-
 	// create user account in database
-	const createdUserAccount = await result(
+	const createdAccount = await result(
 		userAccountModel.create({
-			username,
+			username: validBody.accountUsername,
 			uid: tokenData?.uid,
 			createdAt: new Date().toString(),
-			type: "user",
-			data: {},
+			type: validBody.accountType,
 		}),
 	);
 
-	// if could not create user account, return error
-	if (isError(createdUserAccount))
+	// if could not create account, return error
+	if (isError(createdAccount))
 		return res
 			.status(401)
 			.json({ message: "Could not create your account in db" });
 
 	// finally create session using uid retrieved from database
-	req.session.uid = createdUserAccount.uid;
+	req.session.uid = createdAccount.uid;
 
-	return res.send("successfully registered user");
-}
-
-// for testing
-// to register a company (only to be used by admin account)
-// TODO delete and integrate into main register route
-export async function registerCompany(req: RequestExt, res: ResponseExt) {
-	// token data is already added to the request by the previous middleware
-	const tokenData = req.tokenData;
-
-	// try to find user account in database
-	const companyAccount = await result(
-		companyAccountModel.findOne({
-			uid: tokenData?.uid,
-		}),
-	);
-
-	// if got error while finding account, return error
-	if (isError(companyAccount))
-		return res
-			.status(401)
-			.json({ message: "Could not try to find if you already got an account" });
-
-	// if user account already exists, return error
-	if (companyAccount)
-		return res
-			.status(401)
-			.json({ message: "You already got an account, cannot make another" });
-
-	// TODO use request data
-	const username = "companyUsername";
-
-	// create user account in database
-	const createdCompanyAccount = await result(
-		companyAccountModel.create({
-			username,
-			uid: tokenData?.uid,
-			createdAt: new Date().toString(),
-			type: "company",
-			permissions: {},
-		}),
-	);
-
-	// if could not create user account, return error
-	if (isError(createdCompanyAccount))
-		return res
-			.status(401)
-			.json({ message: "Could not create your account in db" });
-
-	// finally create session using uid retrieved from database
-	req.session.uid = createdCompanyAccount.uid;
-
-	return res.send("successfully registered user");
+	return res.send("successfully registered the account");
 }
 
 export async function logout(req: RequestExt, res: ResponseExt) {
