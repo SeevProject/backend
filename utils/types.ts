@@ -9,7 +9,12 @@ export interface SessionWithUID extends Session {
 
 // extend request to include token data
 export interface RequestExt extends Request {
-	tokenData?: DecodedIdToken;
+	tokenData?:
+		| DecodedIdToken
+		// for testing
+		| {
+				uid: string;
+		  };
 	session: SessionWithUID;
 }
 

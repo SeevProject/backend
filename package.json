@@ -17,6 +17,7 @@
 		"tsx": "^3.12.3"
 	},
 	"dependencies": {
+		"@pdfme/generator": "^1.1.10",
 		"connect-mongo": "^5.0.0",
 		"cors": "^2.8.5",
 		"dotenv": "^16.0.3",

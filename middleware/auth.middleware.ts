@@ -3,13 +3,31 @@ import { isError, result } from "../utils/error";
 import { firebaseAdmin } from "../utils/firebase";
 import { RequestExt, ResponseExt } from "../utils/types";
 import { adminAccountModel } from "../models/adminAccount.model";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 // middlware that forbids anyone without a google auth token from accessing
+// requires tokens from firebase
+// for testing, we've removed that requirement
 export async function requiresToken(
 	req: RequestExt,
 	res: ResponseExt,
 	next: NextFunction,
 ) {
+	// for testing
+	// if in dev mode do not read tokens
+	// provide a uid in the body
+	if (process.env.DEV) {
+		if (!req.body.uid) return res.status(400).json({message: "Please add a uid in the body"})
+
+		req.tokenData = {
+			uid: req.body.uid,
+		};
+
+		next();
+	}
+
 	// get jwt token from client
 	const jwtToken = req.headers.authorization?.split(" ")[1];
 

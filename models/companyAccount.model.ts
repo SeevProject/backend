@@ -38,32 +38,32 @@ const companyAccountSchema = new Schema<CompanyAccount>({
 	},
 	permissions: [
 		{
-			contact: { type: Boolean, required: true },
+			contact: { type: Boolean, required: false },
 			status: {
-				employed: { type: Boolean, required: true },
-				student: { type: Boolean, required: true },
+				employed: { type: Boolean, required: false },
+				student: { type: Boolean, required: false },
 			},
 			languages: [
 				{
-					name: { type: String, required: true },
+					name: { type: String, required: false },
 				},
 			],
 			skills: [
 				{
-					name: { type: String, required: true },
-					level: { type: Number, required: true },
+					name: { type: String, required: false },
+					level: { type: Number, required: false },
 				},
 			],
 			courses: [
 				{
-					subjects: { type: [String], required: true },
+					subjects: { type: [String], required: false },
 				},
 			],
 			education: [
 				{
-					facility: { type: String, required: true },
-					degree_level: { type: [String], required: true },
-					degree_field: { type: [String], required: true },
+					facility: { type: String, required: false },
+					degree_level: { type: [String], required: false },
+					degree_field: { type: [String], required: false },
 				},
 			],
 		},
