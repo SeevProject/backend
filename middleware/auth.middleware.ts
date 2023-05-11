@@ -19,13 +19,15 @@ export async function requiresToken(
 	// if in dev mode do not read tokens
 	// provide a uid in the body
 	if (process.env.DEV) {
-		if (!req.body.uid) return res.status(400).json({message: "Please add a uid in the body"})
+		if (!req.body.uid)
+			return res.status(400).json({ message: "Please add a uid in the body" });
 
 		req.tokenData = {
 			uid: req.body.uid,
 		};
 
 		next();
+		return;
 	}
 
 	// get jwt token from client
