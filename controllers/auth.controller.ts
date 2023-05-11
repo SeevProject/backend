@@ -3,34 +3,37 @@ import { isError, result } from "../utils/error";
 import { userAccountModel } from "../models/userAccount.model";
 import { RequestExt, ResponseExt } from "../utils/types";
 import { companyAccountModel } from "../models/companyAccount.model";
+import { accountModel } from "../models/account.model";
 
 export async function login(req: RequestExt, res: ResponseExt) {
 	// token data is already added to the request by the previous middleware
 	const tokenData = req.tokenData;
 
-	// try to find user account in database
-	const userAccount = await result(
-		userAccountModel.findOne({
+	// try to find account in database
+	const account = await result(
+		// accountModel will search in all account types
+		accountModel.findOne({
+			// use uid from token
 			uid: tokenData?.uid,
 		}),
 	);
 
 	// if got error while finding account, return error
-	if (isError(userAccount))
+	if (isError(account))
 		return res
 			.status(401)
 			.json({ message: "Could not finish search for your account" });
 
 	// if user account does not exist, return error
-	if (!userAccount)
+	if (!account)
 		return res
 			.status(401)
 			.json({ message: "You do not have an account to login to" });
 
 	// finally create session using uid retrieved from database
-	req.session.uid = userAccount.uid;
+	req.session.uid = account.uid;
 
-	return res.status(200).json({ message: "successfully logged user in" });
+	return res.status(200).json({ message: "successfully logged in" });
 }
 
 export async function register(req: RequestExt, res: ResponseExt) {

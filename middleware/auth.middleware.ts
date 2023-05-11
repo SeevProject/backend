@@ -20,7 +20,9 @@ export async function requiresToken(
 	// provide a uid in the body
 	if (process.env.DEV) {
 		if (!req.body.uid)
-			return res.status(400).json({ message: "Please add a uid in the body" });
+			return res.status(400).json({
+				message: "DEV MODE: Please add a uid in the body of the request",
+			});
 
 		req.tokenData = {
 			uid: req.body.uid,
