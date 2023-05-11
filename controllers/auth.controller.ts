@@ -1,13 +1,8 @@
-import { firebaseAdmin } from "../utils/firebase";
 import { isError, result } from "../utils/error";
 import { userAccountModel } from "../models/userAccount.model";
 import { RequestExt, ResponseExt } from "../utils/types";
-import { companyAccountModel } from "../models/companyAccount.model";
 import { accountModel } from "../models/account.model";
-import {
-	registerValidation,
-	validateRegisterBody,
-} from "../validation/auth.validation";
+import { validateRegister } from "../validation/auth.validation";
 
 export async function login(req: RequestExt, res: ResponseExt) {
 	// token data is already added to the request by the previous middleware
@@ -45,7 +40,7 @@ export async function register(req: RequestExt, res: ResponseExt) {
 	const tokenData = req.tokenData;
 
 	// validate req.body data and return error if not matching
-	const validationResult = registerValidation.safeParse(req.body);
+	const validationResult = validateRegister.safeParse(req.body);
 	if (!validationResult.success)
 		return res.status(400).json({ message: validationResult.error });
 
@@ -73,11 +68,12 @@ export async function register(req: RequestExt, res: ResponseExt) {
 
 	// create user account in database
 	const createdAccount = await result(
-		userAccountModel.create({
-			username: validBody.accountUsername,
+		// use accountModel as it supports both user types
+		accountModel.create({
+			username: validBody.username,
 			uid: tokenData?.uid,
 			createdAt: new Date().toString(),
-			type: validBody.accountType,
+			type: validBody.type,
 		}),
 	);
 
