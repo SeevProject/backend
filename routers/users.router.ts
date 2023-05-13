@@ -14,5 +14,4 @@ export const usersRouter = Router();
 usersRouter
 	.get("/me", requiresSession, getUserData)
 	.put("/me", requiresSession, updateUserData)
-	.post("/me/generate", requiresSession, generateCV)
 	.get("/", requiresSession, requiresAdmin, getAllUsers);

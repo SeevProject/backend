@@ -6,6 +6,7 @@ import {
 	updateTemplate,
 } from "../controllers/templates.controller";
 import { requiresAdmin, requiresSession } from "../middleware/auth.middleware";
+import { generateCV } from "../controllers/users.controller";
 
 export const templatesRouter = Router();
 
@@ -14,5 +15,6 @@ export const templatesRouter = Router();
 templatesRouter
 	.get("/", requiresSession, requiresAdmin, getAllTemplates)
 	.post("/", requiresSession, requiresAdmin, addTemplate)
+	.post("/:id", requiresSession, generateCV)
 	.put("/:id", requiresSession, requiresAdmin, updateTemplate)
 	.delete("/:id", requiresSession, requiresAdmin, deleteTemplate);

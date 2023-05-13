@@ -1,6 +1,6 @@
-import {z} from "zod"
+import { z } from "zod";
 
-export const addCompanyValidation=(body)=>{
+export const addCompanyValidation = (body) =>{
 const validation = z.object({
 	permissions: z.array(
 		z.object({
