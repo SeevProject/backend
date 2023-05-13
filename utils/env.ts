@@ -3,7 +3,10 @@ import { EnvType, load } from "ts-dotenv";
 const schema = {
 	DEV: Boolean,
 	MONGO_URL: String,
-	PORT: Number,
+	PORT: {
+		type: Number,
+		optional: true,
+	},
 };
 
 type Env = EnvType<typeof schema>;
