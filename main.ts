@@ -49,6 +49,7 @@ app.use(
 
 	// session for cookies
 	session({
+		// TODO set proper secret
 		secret: "hello",
 		saveUninitialized: false,
 		resave: false,
@@ -60,7 +61,8 @@ app.use(
 			httpOnly: true,
 			sameSite: "lax",
 			maxAge: 1000 * 60 * 60 * 24 * 3,
-			// secure: true,
+			// TODO set to secure
+			secure: env.DEV ? false: true,
 		},
 	}),
 );
