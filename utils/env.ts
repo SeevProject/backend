@@ -1,7 +1,10 @@
 import { EnvType, load } from "ts-dotenv";
 
 const schema = {
-	DEV: Boolean,
+	DEV: {
+		type: Boolean,
+		optional: true,
+	},
 	MONGO_URL: String,
 	PORT: {
 		type: Number,
