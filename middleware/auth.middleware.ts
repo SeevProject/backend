@@ -3,9 +3,10 @@ import { isError, result } from "../utils/error";
 import { firebaseAdmin } from "../utils/firebase";
 import { RequestExt, ResponseExt } from "../utils/types";
 import { adminAccountModel } from "../models/adminAccount.model";
-import dotenv from "dotenv";
+import { env, loadEnv } from "../utils/env";
 
-dotenv.config();
+// load environments
+loadEnv();
 
 // middlware that forbids anyone without a google auth token from accessing
 // requires tokens from firebase
@@ -15,10 +16,10 @@ export async function requiresToken(
 	res: ResponseExt,
 	next: NextFunction,
 ) {
-	// for testing
-	// if in dev mode do not read tokens
+	// TESTING CODE
 	// provide a uid in the body
-	if (process.env.DEV) {
+	// if in dev mode do not read tokens
+	if (env.DEV) {
 		if (!req.body.uid)
 			return res.status(400).json({
 				message: "DEV MODE: Please add a uid in the body of the request",
@@ -31,6 +32,7 @@ export async function requiresToken(
 		next();
 		return;
 	}
+	// TESTING CODE END
 
 	// get jwt token from client
 	const jwtToken = req.headers.authorization?.split(" ")[1];

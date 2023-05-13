@@ -1,5 +1,4 @@
 import express from "express";
-import dotenv from "dotenv";
 import { connectDB } from "./utils/mongo";
 import cors from "cors";
 import helmet from "helmet";
@@ -9,14 +8,15 @@ import { authRouter } from "./routers/auth.router";
 import { companiesRouter } from "./routers/companies.router";
 import mongoStore from "connect-mongo";
 import session from "express-session";
-import { requiresSession } from "./middleware/auth.middleware";
 import { rateLimit } from "express-rate-limit";
+import { loadEnv } from "./utils/env";
+import { env } from "./utils/env";
 
 // import env variables
-dotenv.config();
+loadEnv();
 
 // connect to the database
-connectDB(process.env.MONGO_URL || "");
+connectDB(env.MONGO_URL || "");
 
 // create app
 const app = express();
@@ -34,7 +34,7 @@ app.use(
 	cors({
 		credentials: true,
 		// TODO change to domain later
-		origin: "*",
+		origin: env.DEV ? "*" : "*",
 		methods: ["GET", "POST", "PUT", "DELETE"],
 	}),
 
@@ -53,7 +53,7 @@ app.use(
 		saveUninitialized: false,
 		resave: false,
 		store: mongoStore.create({
-			mongoUrl: process.env.MONGO_URL || "",
+			mongoUrl: env.MONGO_URL || "",
 			dbName: "testing",
 		}),
 		cookie: {
@@ -66,7 +66,7 @@ app.use(
 );
 
 // set server port
-const PORT = process.env.PORT || 3000;
+const PORT = env.PORT || 3000;
 
 // add routers to app
 // all require auth except auth itself
