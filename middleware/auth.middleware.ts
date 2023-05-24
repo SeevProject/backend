@@ -89,7 +89,7 @@ export async function requiresAdmin(
 			uid: req.session.uid,
 		}),
 	);
-
+ 
 	// if got error while finding account, return error
 	if (isError(adminAccount))
 		return res

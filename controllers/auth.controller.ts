@@ -3,6 +3,7 @@ import { userAccountModel } from "../models/userAccount.model";
 import { RequestExt, ResponseExt } from "../utils/types";
 import { accountModel } from "../models/account.model";
 import { validateRegister } from "../validation/auth.validation";
+import { companyAccountModel } from "../models/companyAccount.model";
 
 export async function login(req: RequestExt, res: ResponseExt) {
 	// token data is already added to the request by the previous middleware
@@ -66,16 +67,35 @@ export async function register(req: RequestExt, res: ResponseExt) {
 			.status(401)
 			.json({ message: "You already got an account, cannot make another" });
 
-	// create user account in database
-	const createdAccount = await result(
-		// use accountModel as it supports both user types
-		accountModel.create({
-			username: validBody.username,
-			uid: tokenData?.uid,
-			createdAt: new Date().toString(),
-			type: validBody.type,
-		}),
-	);
+
+	// // create user account in database
+	// const createdAccount = await result(
+	// 	// use accountModel as it supports both user types
+	// 	accountModel.create({
+	// 		username: validBody.username,
+	// 		uid: tokenData?.uid,
+	// 		createdAt: new Date().toString(),
+	// 		type: validBody.type,
+	// 	}),
+	// );
+
+	 let createdAccount;
+
+		if (validBody.type == "company") {
+			createdAccount = companyAccountModel.create({
+				username: validBody.username,
+				uid: tokenData?.uid,
+				createdAt: new Date().toString(),
+				type: "company",
+			});
+		} else {
+			createdAccount = userAccountModel.create({
+				username: validBody.username,
+				uid: tokenData?.uid,
+				createdAt: new Date().toString(),
+				type: "user",
+			});
+		}
 
 	// if could not create account, return error
 	if (isError(createdAccount))
