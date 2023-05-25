@@ -3,12 +3,14 @@ import { isError, result } from "../utils/error";
 import { RequestExt, ResponseExt } from "../utils/types";
 
 export async function getAllCompanies(req: RequestExt, res: ResponseExt) {
-	try {
-		const company = await companyAccountModel.find();
-		res.status(200).json({ status: "sucsess", data: company });
-	} catch (error) {
-		res.status(404).json({ status: "error", message: error });
-	}
+	const company = await result(companyAccountModel.find());
+
+	if (isError(company))
+		return res
+			.status(404)
+			.json({ status: "error", message: "Could not return companys data" });
+
+	res.status(200).json({ status: "sucsess", data: company });
 }
 
 export async function approveCompany(req: RequestExt, res: ResponseExt) {
@@ -27,36 +29,46 @@ export async function approveCompany(req: RequestExt, res: ResponseExt) {
 	console.log(account);
 	// if could not update, return error
 	if (isError(account))
-		return res.status(500).json({ message: "Could not approve company account"  });
+		return res
+			.status(500)
+			.json({ message: "Could not approve company account" });
 
 	return res.status(200).json({ message: "company account approved" });
 }
 
 export async function getCompanyData(req: RequestExt, res: ResponseExt) {
-	try {
-		  const company = await companyAccountModel.findById(req.params.id);
-		   res.status(200).json({ status: "sucsess", data: company });
-	} catch (error) {
-		res.status(404).json({ status: "error", message: error });
-	}
+	const company = await result(companyAccountModel.findById(req.params.id));
+
+	if (isError(company))
+		res
+			.status(404)
+			.json({ status: "error", message: "Could not return company data" });
+
+	res.status(200).json({ status: "sucsess", data: company });
 }
 
 export async function updateCompanyData(req: RequestExt, res: ResponseExt) {
-		try {
-			const company = await companyAccountModel.findByIdAndUpdate(
-				 req.params.id,
-				{ $push: { permissions: req.body.permissions } })
-			res.status(200).json({ status: "sucsess", data: company });
-		} catch (error) {
-			res.status(404).json({ status: "error", message: error });
-		}
+	const company = await result(
+		companyAccountModel.findByIdAndUpdate(req.params.id, {
+			$push: { permissions: req.body.permissions },
+		}),
+	);
+	if (isError(company))
+		res
+			.status(404)
+			.json({ status: "error", message: "Could not update company data" });
+
+	res.status(200).json({ status: "sucsess", data: company });
 }
 
 export async function deleteCompany(req: RequestExt, res: ResponseExt) {
-		try {
-			const company = await companyAccountModel.findByIdAndDelete(req.params.id);
-			res.status(200).json({ status: "sucsess", data: company });
-		} catch (error) {
-			res.status(404).json({ status: "error", message: error });
-		}
+	const company = await result(
+		companyAccountModel.findByIdAndDelete(req.params.id),
+	);
+	if (isError(company))
+		res
+			.status(404)
+			.json({ status: "error", message: "Could not delete company data" });
+
+	res.status(200).json({ status: "sucsess", data: company });
 }
