@@ -1,31 +1,46 @@
 import { z } from "zod";
 import { RequestExt, ResponseExt } from "../utils/types";
+import { isError, result } from "../utils/error";
+import { userAccountModel } from "../models/userAccount.model";
 
 export async function getAllUsers(req: RequestExt, res: ResponseExt) {
-	return res.send(["user1", "user2"]);
+	const user = await result(userAccountModel.find());
+
+	if (isError(user))
+		return res
+			.status(404)
+			.json({ status: "error", message: "Could not return users " });
+
+	return res.status(200).json({ status: "sucsess", data: user });
 }
 
 export async function getUserData(req: RequestExt, res: ResponseExt) {
 	const userId = req.session.uid;
+	const user = await result(userAccountModel.findOne({ uid: userId }));
+	if (isError(user))
+		return res
+			.status(404)
+			.json({ status: "error", message: "Could not return user " });
 
-	return res.json({ uid: userId });
+	return res.status(200).json({ status: "sucsess", data: user });
 }
 
 export async function updateUserData(req: RequestExt, res: ResponseExt) {
-	const userUpdateValidator = z.object({
-		data: z.object({
-			name: z.object({
-				first: z.string(),
-				middle: z.string(),
-				last: z.string(),
-			}),
-		}),
-	});
+	const userId = req.session.uid;
+	const user = await result(
+		userAccountModel.findOneAndUpdate(
+			{ uid: userId },
+			{
+				$set: { data: req.body.data },
+			},
+		),
+	)
+	if (isError(user))
+		return res
+			.status(404)
+			.json({ status: "error", message: "Could not update user data" });
 
-	const result = userUpdateValidator.safeParse(req.body);
-	if (!result.success) return res.status(400).json(result.error);
-
-	return res.send("updating user data");
+	return res.status(200).json({ status: "sucsess", data: user });
 }
 
 export async function generateCV(req: RequestExt, res: ResponseExt) {

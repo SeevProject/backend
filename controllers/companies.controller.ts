@@ -10,7 +10,7 @@ export async function getAllCompanies(req: RequestExt, res: ResponseExt) {
 			.status(404)
 			.json({ status: "error", message: "Could not return companys data" });
 
-	res.status(200).json({ status: "sucsess", data: company });
+	return res.status(200).json({ status: "sucsess", data: company });
 }
 
 export async function approveCompany(req: RequestExt, res: ResponseExt) {
@@ -40,11 +40,11 @@ export async function getCompanyData(req: RequestExt, res: ResponseExt) {
 	const company = await result(companyAccountModel.findById(req.params.id));
 
 	if (isError(company))
-		res
+		return res
 			.status(404)
 			.json({ status: "error", message: "Could not return company data" });
 
-	res.status(200).json({ status: "sucsess", data: company });
+	return res.status(200).json({ status: "sucsess", data: company });
 }
 
 export async function updateCompanyData(req: RequestExt, res: ResponseExt) {
@@ -54,11 +54,11 @@ export async function updateCompanyData(req: RequestExt, res: ResponseExt) {
 		}),
 	);
 	if (isError(company))
-		res
+		return res
 			.status(404)
 			.json({ status: "error", message: "Could not update company data" });
 
-	res.status(200).json({ status: "sucsess", data: company });
+	return res.status(200).json({ status: "sucsess", data: company });
 }
 
 export async function deleteCompany(req: RequestExt, res: ResponseExt) {
@@ -66,9 +66,9 @@ export async function deleteCompany(req: RequestExt, res: ResponseExt) {
 		companyAccountModel.findByIdAndDelete(req.params.id),
 	);
 	if (isError(company))
-		res
+		return res
 			.status(404)
 			.json({ status: "error", message: "Could not delete company data" });
 
-	res.status(200).json({ status: "sucsess", data: company });
+	return res.status(200).json({ status: "sucsess", data: company });
 }
