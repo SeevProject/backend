@@ -49,9 +49,12 @@ export async function getCompanyData(req: RequestExt, res: ResponseExt) {
 
 export async function updateCompanyData(req: RequestExt, res: ResponseExt) {
 	const company = await result(
-		companyAccountModel.findByIdAndUpdate(req.params.id, {
-			$push: { permissions: req.body.permissions },
-		}),
+		companyAccountModel.updateOne(
+			{ _id: req.params.id },
+			{
+				$set: { permissions: req.body.permissions },
+			},
+		),
 	);
 	if (isError(company))
 		return res
