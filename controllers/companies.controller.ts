@@ -14,25 +14,21 @@ export async function getAllCompanies(req: RequestExt, res: ResponseExt) {
 }
 
 export async function approveCompany(req: RequestExt, res: ResponseExt) {
-	// TODO add validation
-	// the id of the company to be approved
-	const companyId = req.body.companyID;
-
 	// try to update the account and change approved status
 	const account = await result(
 		companyAccountModel.updateOne(
-			{ _id: companyId },
+			{ _id: req.params.id },
 			{ $set: { approved: true } },
 		),
 	);
 
-	console.log(account);
 	// if could not update, return error
 	if (isError(account))
 		return res
 			.status(500)
 			.json({ message: "Could not approve company account" });
 
+	// if could update, return success
 	return res.status(200).json({ message: "company account approved" });
 }
 

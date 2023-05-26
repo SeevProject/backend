@@ -15,6 +15,6 @@ export const companiesRouter = Router();
 companiesRouter
 	.get("/:id", requiresSession, getCompanyData)
 	.get("/", requiresSession, requiresAdmin, getAllCompanies)
-	.post("/", requiresSession, requiresAdmin, approveCompany)
+	.post("/:id", requiresSession, requiresAdmin, approveCompany)
 	.put("/:id", requiresSession, requiresAdmin, updateCompanyData)
 	.delete("/:id", requiresSession, requiresAdmin, deleteCompany);
