@@ -1,15 +1,32 @@
 import { readFileSync } from "fs";
-import path from "path";
 
 type Field = {
 	exact: string;
 	properties: { key: string; value: string }[];
 };
 
-export function readAndParseFile(): Field[] {
-	const file = readFileSync(path.join(__dirname, "cv.html"));
-	const fields = parseFields(file.toString());
-	return fields;
+type Template = {
+	name: string;
+	fields: Field[];
+};
+
+export function parseTemplateFromFile(
+	templateName: string,
+	filePath: string,
+): Template {
+	// read the file
+	const fileBuffer = readFileSync(filePath);
+
+	// parse the fields
+	const parsedFields = parseFields(fileBuffer.toString());
+
+	// put together the template
+	const template = {
+		name: templateName,
+		fields: parsedFields,
+	};
+
+	return template;
 }
 
 export function parseFields(fileString: string): Field[] {
