@@ -44,11 +44,30 @@
 				</svg>
 
 				<div>
-					<!--$
-						#key=name#
-						#before=<p>#after=</p>#
-						#length=25#type=string#
-					 $$-->
+					<div class="flex flex-row">
+						<p
+							length="25"
+							type="string"
+							id="name.first"
+							class="font-bold text-2xl"
+						>
+							Hi
+						</p>
+
+						<p
+							length="25"
+							type="string"
+							id="name.middle"
+							class="font-bold text-2xl ml-2"
+						></p>
+
+						<p
+							length="25"
+							type="string"
+							id="name.last"
+							class="font-bold text-2xl ml-2"
+						></p>
+					</div>
 					<p>Email: myemail@example.com</p>
 					<p>Phone: 1234567890</p>
 				</div>
@@ -59,12 +78,9 @@
 				<div class="section flex flex-col gap-2">
 					<h2 class="font-bold text-xl">Skills</h2>
 					<ul class="skills">
-						<!--$
-							#key=skills#
-							#key2=name#
-							#before=<li>#after=</li>#
-							#loop=5#length=15#type=string#
-						$$-->
+						<li length="15" repeat="5" id="skill.0.name" class="font-bold">
+							Programming Language
+						</li>
 					</ul>
 				</div>
 				<!-- Left End-->
