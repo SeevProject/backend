@@ -5,7 +5,7 @@ type Field = {
 	properties: { key: string; value: string }[];
 };
 
-type Template = {
+export type Template = {
 	name: string;
 	fields: Field[];
 };
@@ -96,7 +96,7 @@ export function mapField(fieldRange: string): Field {
 
 	// map the properties into key value pairs
 	let parsedProperties = properties.map((property) => {
-		let [key, value] = property.split("_");
+		let [key, value] = property.split("=");
 
 		return { key, value };
 	});
