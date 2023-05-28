@@ -1,6 +1,4 @@
-export const user = {
-	cvlist: ["CV1", "CV2"],
-	data: {
+export const userData = {
 		name: {
 			first: "John",
 			middle: "Doe",
@@ -75,5 +73,4 @@ export const user = {
 				about: "Explore nature and enjoy outdoor adventures.",
 			},
 		],
-	},
 };

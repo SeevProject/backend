@@ -2,7 +2,7 @@ import { readFileSync } from "fs";
 
 type Field = {
 	exact: string;
-	properties: { key: string; value: string }[];
+	properties: Map<string, string>;
 };
 
 export type Template = {
@@ -94,16 +94,16 @@ export function mapField(fieldRange: string): Field {
 		.split("#")
 		.filter((prop) => prop !== "");
 
-	// map the properties into key value pairs
-	let parsedProperties = properties.map((property) => {
+	// loop over properties and turn them into key value pairs using map data structure
+	let propertiesMap: Map<string, string> = new Map();
+	for (const property of properties) {
 		let [key, value] = property.split("=");
-
-		return { key, value };
-	});
+		propertiesMap.set(key, value);
+	}
 
 	// return the field
 	return {
 		exact: fieldRange,
-		properties: parsedProperties,
+		properties: propertiesMap,
 	};
 }
