@@ -1,6 +1,4 @@
-import { load, CheerioAPI } from "cheerio";
-import { readFileSync } from "fs";
-import path from "path";
+import { CheerioAPI } from "cheerio";
 
 export function handleRepeats(doc: CheerioAPI) {
 	// go through all elements with repeat attribute
@@ -41,20 +39,14 @@ export function handleRepeats(doc: CheerioAPI) {
 	});
 }
 
-export function runReplacer() {
-	const fileString = readFileSync(
-		path.join(__dirname, "./example/cv.html"),
-		"utf8",
-	);
+export function insertData(doc: CheerioAPI, data: any) {
+	doc("[id]").each((_, element) => {
+		const elementId = doc(element).attr("id");
+		if (!elementId) return;
 
-	const document = load(fileString);
+		const elementValue = data[elementId];
+		if (!elementValue) return;
 
-	handleRepeats(document);
-
-	// Get the modified HTML
-	const modifiedHtml = document.html();
-
-	console.log(modifiedHtml);
+		doc(element).text(elementValue);
+	});
 }
-
-runReplacer();
