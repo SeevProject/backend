@@ -17,7 +17,9 @@ export async function runGenerator(
 
 	handleRepeats(document);
 
-	insertData(document, flattenObject(data));
+	const problems = insertData(document, flattenObject(data));
+
+	console.log(problems);
 
 	const modifiedHtml = document.html();
 

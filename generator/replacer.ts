@@ -94,7 +94,5 @@ export function insertData(doc: CheerioAPI, data: any) {
 		doc(element).text(dataValue);
 	});
 
-	console.log(problems);
-
 	return problems;
 }

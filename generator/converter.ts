@@ -11,11 +11,10 @@ export async function convertHTMLtoPDF(htmlString: string, outputPath: string) {
 		waitUntil: "networkidle0",
 	});
 
-	await page.evaluateHandle('document.fonts.ready');
+	await page.evaluateHandle("document.fonts.ready");
 
 	// convert the page to pdf and save it to the output path
 	await page.pdf({ path: outputPath, format: "A4" });
-
 
 	// close the browser
 	await browser.close();
