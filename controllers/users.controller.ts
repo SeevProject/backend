@@ -2,6 +2,7 @@ import { z } from "zod";
 import { RequestExt, ResponseExt } from "../utils/types";
 import { isError, result } from "../utils/error";
 import { userAccountModel } from "../models/userAccount.model";
+import { templateModel } from "../models/template.model";
 
 export async function getAllUsers(req: RequestExt, res: ResponseExt) {
 	const user = await result(userAccountModel.find());
@@ -34,7 +35,7 @@ export async function updateUserData(req: RequestExt, res: ResponseExt) {
 				$set: { data: req.body.data },
 			},
 		),
-	)
+	);
 	if (isError(user))
 		return res
 			.status(404)
@@ -44,5 +45,11 @@ export async function updateUserData(req: RequestExt, res: ResponseExt) {
 }
 
 export async function generateCV(req: RequestExt, res: ResponseExt) {
-	return res.send("generating cv");
+	const template = await result(templateModel.create(req.body));
+	if (isError(template))
+		return res
+			.status(404)
+			.json({ status: "error", message: "Could not create template " });
+
+	return res.status(200).json({ status: "sucsess", data: template });
 }
