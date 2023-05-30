@@ -1,6 +1,7 @@
 import { companyAccountModel } from "../models/companyAccount.model";
 import { isError, result } from "../utils/error";
 import { RequestExt, ResponseExt } from "../utils/types";
+import { CompanyValidation } from "../validation/company.validation";
 
 export async function getAllCompanies(req: RequestExt, res: ResponseExt) {
 	const company = await result(companyAccountModel.find());
@@ -44,11 +45,18 @@ export async function getCompanyData(req: RequestExt, res: ResponseExt) {
 }
 
 export async function updateCompanyData(req: RequestExt, res: ResponseExt) {
+	const validationResult = CompanyValidation(req.body);
+	// console.log(validationResult)
+	if(!validationResult.success)
+	  return res.status(400).json({status:"Error",message:validationResult.error})
+
+	const validateData=validationResult.data.permissions
+
 	const company = await result(
 		companyAccountModel.updateOne(
 			{ _id: req.params.id },
 			{
-				$set: { permissions: req.body.permissions },
+				$set: { permissions: validateData },
 			},
 		),
 	);
