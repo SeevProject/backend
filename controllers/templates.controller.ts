@@ -1,6 +1,7 @@
 import { templateModel } from "../models/template.model";
 import { isError, result } from "../utils/error";
 import { RequestExt, ResponseExt } from "../utils/types";
+import { templateValidation } from "../validation/template.validation";
 
 export async function getAllTemplates(req: RequestExt, res: ResponseExt) {
 	const template = await result(templateModel.find());
@@ -13,7 +14,16 @@ export async function getAllTemplates(req: RequestExt, res: ResponseExt) {
 }
 
 export async function addTemplate(req: RequestExt, res: ResponseExt) {
-	const template = await result(templateModel.create(req.body));
+
+	const validationResult = templateValidation(req.body);
+	if (!validationResult.success)
+		return res
+			.status(400)
+			.json({ status: "Error", message: validationResult.error });
+
+	const validateData = validationResult.data;
+
+	const template = await result(templateModel.create(validateData));
 	if (isError(template))
 		return res
 			.status(404)
@@ -23,11 +33,20 @@ export async function addTemplate(req: RequestExt, res: ResponseExt) {
 }
 
 export async function updateTemplate(req: RequestExt, res: ResponseExt) {
+
+	const validationResult = templateValidation(req.body);
+	if (!validationResult.success)
+		return res
+			.status(400)
+			.json({ status: "Error", message: validationResult.error });
+
+	const validateData = validationResult.data;
+
 	const template = await result(
 		templateModel.updateOne(
 			{ _id: req.params.id },
 			{
-				$set: req.body,
+				$set: validateData,
 			},
 		),
 	);
