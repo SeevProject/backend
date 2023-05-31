@@ -11,6 +11,7 @@ import session from "express-session";
 import { rateLimit } from "express-rate-limit";
 import { loadEnv } from "./utils/env";
 import { env } from "./utils/env";
+import fileUpload from "express-fileupload";
 
 // import env variables
 loadEnv();
@@ -65,6 +66,14 @@ app.use(
 			secure: env.DEV ? false: true,
 		},
 	}),
+
+	// fileupload handling
+	fileUpload({
+		createParentPath: true,
+		limits: {
+			fileSize: 10 * 1024 * 1024 * 1024, // 10MB max file(s) size
+		}
+	})
 );
 
 // set server port
