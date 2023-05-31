@@ -1,6 +1,10 @@
 import { readFile } from "fs/promises";
 import { insertData } from "../generator/inserter";
-import { flattenObject, getCompatability } from "../generator/parser";
+import {
+	flattenObject,
+	getCompatability,
+	parseTemplate,
+} from "../generator/parser";
 import { templateModel } from "../models/template.model";
 import { userAccountModel } from "../models/userAccount.model";
 import { isError, result } from "../utils/error";
@@ -22,46 +26,52 @@ export async function getAllTemplates(req: RequestExt, res: ResponseExt) {
 }
 
 export async function addTemplate(req: RequestExt, res: ResponseExt) {
-	const validationResult = templateValidation(req.body);
-	if (!validationResult.success)
-		return res
-			.status(400)
-			.json({ status: "Error", message: validationResult.error });
+	if (!req.files)
+		return res.status(400).json({ status: "Could not find submitted file" });
 
-	const validateData = validationResult.data;
+	// get file from request
+	const reqFile = req.files.template;
 
-	const template = await result(templateModel.create(validateData));
-	if (isError(template))
+	if (Array.isArray(reqFile))
+		return res.status(400).json({ status: "Submit only one file" });
+
+	const firebaseLink = `templates/${uid(10)}.html`;
+
+	// upload file to firebase
+	const uploadResult = await result(
+		firebaseStorage.upload(reqFile.tempFilePath, {
+			destination: firebaseLink,
+		}),
+	);
+
+	if (isError(uploadResult))
 		return res
 			.status(404)
-			.json({ status: "error", message: "Could not create template " });
+			.json({ status: "error", message: "Could not upload file to firebase" });
 
-	return res.status(200).json({ status: "sucsess", data: template });
+	// read file and use cheerio to load it
+	const templateFile = reqFile.data.toString();
+	const templateFileAsDocument = load(templateFile);
+
+	// parse data in template file and get template object
+	const template = parseTemplate(templateFileAsDocument, firebaseLink);
+
+	// add template object to to db
+	const createResult = await result(templateModel.create(template));
+
+	if (isError(createResult))
+		return res
+			.status(404)
+			.json({ status: "error", message: "Could not add template to db" });
+
+	// reply with success
+	return res
+		.status(200)
+		.json({ status: "Added template to db", data: createResult });
 }
 
 export async function updateTemplate(req: RequestExt, res: ResponseExt) {
-	const validationResult = templateValidation(req.body);
-	if (!validationResult.success)
-		return res
-			.status(400)
-			.json({ status: "Error", message: validationResult.error });
-
-	const validateData = validationResult.data;
-
-	const template = await result(
-		templateModel.updateOne(
-			{ _id: req.params.id },
-			{
-				$set: validateData,
-			},
-		),
-	);
-	if (isError(template))
-		return res
-			.status(404)
-			.json({ status: "error", message: "Could not update template data" });
-
-	return res.status(200).json({ status: "sucsess", data: template });
+	return null;
 }
 
 export async function deleteTemplate(req: RequestExt, res: ResponseExt) {
@@ -193,7 +203,7 @@ export async function generateFromTemplate(req: RequestExt, res: ResponseExt) {
 			{ uid: req.session.uid },
 			{
 				$push: {
-					"cvlinks": uploadResult[0].metadata.mediaLink,
+					cvlinks: uploadResult[0].metadata.mediaLink,
 				},
 			},
 		),

@@ -63,17 +63,18 @@ app.use(
 			sameSite: "lax",
 			maxAge: 1000 * 60 * 60 * 24 * 3,
 			// TODO set to secure
-			secure: env.DEV ? false: true,
+			secure: env.DEV ? false : true,
 		},
 	}),
 
 	// fileupload handling
 	fileUpload({
 		createParentPath: true,
+		useTempFiles: true,
 		limits: {
 			fileSize: 10 * 1024 * 1024 * 1024, // 10MB max file(s) size
-		}
-	})
+		},
+	}),
 );
 
 // set server port
