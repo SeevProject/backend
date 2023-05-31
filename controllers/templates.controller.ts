@@ -14,7 +14,6 @@ export async function getAllTemplates(req: RequestExt, res: ResponseExt) {
 }
 
 export async function addTemplate(req: RequestExt, res: ResponseExt) {
-
 	const validationResult = templateValidation(req.body);
 	if (!validationResult.success)
 		return res
@@ -33,7 +32,6 @@ export async function addTemplate(req: RequestExt, res: ResponseExt) {
 }
 
 export async function updateTemplate(req: RequestExt, res: ResponseExt) {
-
 	const validationResult = templateValidation(req.body);
 	if (!validationResult.success)
 		return res
@@ -68,4 +66,8 @@ export async function deleteTemplate(req: RequestExt, res: ResponseExt) {
 			.json({ status: "error", message: "Could not update template data" });
 
 	return res.status(200).json({ status: "sucsess", data: template });
+}
+
+export async function generateCV(req: RequestExt, res: ResponseExt) {
+	return null;
 }
