@@ -68,6 +68,6 @@ export async function deleteTemplate(req: RequestExt, res: ResponseExt) {
 	return res.status(200).json({ status: "sucsess", data: template });
 }
 
-export async function generateCV(req: RequestExt, res: ResponseExt) {
+export async function generateFromTemplate(req: RequestExt, res: ResponseExt) {
 	return null;
 }
