@@ -1,20 +1,23 @@
 import { Schema, model, Document } from "mongoose";
 
-// Define the template schema
-export interface Template extends Document {
+export interface TemplateType {
 	link: string;
 	fields: {
-		title: string;
-		char_limit: number;
+		id: string;
+		length: number;
+		type: "string" | "number" | "unknown";
 	}[];
 	preview: string;
 }
+
+// Define the template schema
+interface Template extends Document, TemplateType {}
 
 const templateSchema = new Schema<Template>({
 	link: { type: String, required: true },
 	fields: [
 		{
-			title: { type: String, required: true },
+			id: { type: String, required: true },
 			char_limit: { type: Number, required: true },
 		},
 	],

@@ -41,7 +41,7 @@ export function handleRepeats(doc: CheerioAPI) {
 }
 
 export function insertData(doc: CheerioAPI, data: any) {
-	let problems: string[] = [];
+	handleRepeats(doc);
 
 	doc("[id]").each((_, element) => {
 		// get element id
@@ -52,47 +52,10 @@ export function insertData(doc: CheerioAPI, data: any) {
 		let dataValue = data[elementId];
 		if (!dataValue) return;
 
-		// compare lengths
-
-		const elementLength = doc(element).attr("length");
-		if (elementLength) {
-			const elementLengthValue = parseInt(elementLength);
-
-			if (dataValue.length > elementLengthValue) {
-				problems.push(
-					`${dataValue} is ${dataValue.length} characters long. But no more than ${elementLength} is accepted on ${elementId}`,
-				);
-				dataValue = dataValue.substring(0, elementLengthValue);
-			}
-		}
-
-		// compare type
-
-		const elementType = doc(element).attr("type");
-
-		if (elementType) {
-			if (elementType == "string" && typeof dataValue !== "string") {
-				problems.push(
-					`${dataValue} is not a string. But a string is expected on ${elementId}`,
-				);
-			} else if (elementType == "number") {
-				const dataValueNumber = parseInt(dataValue);
-				if (isNaN(dataValueNumber)) {
-					problems.push(
-						`${dataValue} is not a number. But a number is expected on ${elementId}`,
-					);
-				} else {
-					dataValue = dataValueNumber;
-				}
-			}
-		}
-
 		// insert the data
 
-		log(`Inserting ${dataValue} into ${elementId}`);
+		log(`LOG: Inserting ${dataValue} into ${elementId}`);
 
 		doc(element).text(dataValue);
 	});
-
-	return problems;
 }

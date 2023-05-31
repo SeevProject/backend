@@ -1,4 +1,3 @@
-import path from "path";
 import puppeteer from "puppeteer";
 
 export async function convertHTMLtoPDF(htmlString: string, outputPath: string) {

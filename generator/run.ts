@@ -1,39 +1,39 @@
 import { load } from "cheerio";
 import { readFileSync } from "fs";
-import path from "path";
-import { handleRepeats, insertData } from "./replacer";
-import { flattenObject } from "./utils";
-import { userData } from "./example/data";
 import { convertHTMLtoPDF } from "./converter";
 import { firebaseStorage } from "../utils/firebase";
+import { insertData } from "./inserter";
+import { flattenObject, getCompatability, parseTemplate } from "./parser";
 
-export async function runGenerator(
+export async function generateCV(
 	data: any,
 	templatePath: string,
+	downloadPath: string,
 	outputPath: string,
 ) {
-	const fileString = readFileSync(templatePath, "utf8");
+	firebaseStorage.file(templatePath).download({
+		destination: downloadPath,
+	});
+	// init
+
+	const fileString = readFileSync(downloadPath).toString();
 
 	const document = load(fileString);
 
-	handleRepeats(document);
+	// parser
 
-	const file = firebaseStorage.file("templates/cv.html");
-	if (await file.exists()) {
-		file.download({ destination: outputPath + "ht" });
-	}
+	let template = parseTemplate(document, templatePath);
+	let flattenedData = flattenObject(data);
 
-	const problems = insertData(document, flattenObject(data));
+	let problems = getCompatability(flattenedData, template);
 
 	console.log(problems);
 
-	const modifiedHtml = document.html();
+	// inserter
 
-	await convertHTMLtoPDF(modifiedHtml, outputPath);
+	insertData(document, flattenObject(data));
+
+	// converter
+
+	await convertHTMLtoPDF(document.html(), outputPath);
 }
-
-runGenerator(
-	userData,
-	path.join(__dirname, "./example/cv.html"),
-	path.join(__dirname, "./example/output.pdf"),
-);
