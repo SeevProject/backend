@@ -5,23 +5,25 @@ import { TemplateType } from "../models/template.model";
 // turns { a: { b: { c: 1 } } } into { a.b.c: 1 }
 export function flattenObject(obj: any) {
 	const flattenedObject: any = {};
+	const stack: any[] = [{ obj, prefix: "" }];
 
-	function flatten(obj: any, prefix: string) {
+	while (stack.length > 0) {
+		const { obj, prefix } = stack.pop();
+
 		Object.keys(obj).forEach((key) => {
 			const value = obj[key];
 
 			if (typeof value === "object") {
-				flatten(value, `${prefix}${key}.`);
+				stack.push({ obj: value, prefix: `${prefix}${key}.` });
 			} else {
 				flattenedObject[`${prefix}${key}`] = value;
 			}
 		});
 	}
 
-	flatten(obj, "");
-
 	return flattenedObject;
 }
+
 
 // function that parses a template from a cheerio document
 export function parseTemplate(doc: CheerioAPI, link: string): TemplateType {
