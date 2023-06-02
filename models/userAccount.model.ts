@@ -6,6 +6,7 @@ import { Account, accountModel } from "./account.model";
 export interface UserAccount extends Account {
 	type: "user";
 	cvlist: string[];
+	picture: string;
 	data: {
 		name: {
 			first: string;
@@ -14,7 +15,6 @@ export interface UserAccount extends Account {
 		};
 		phone: string;
 		email: string;
-		picture: string;
 		about: string;
 		status: {
 			employed: boolean;
@@ -62,6 +62,8 @@ const userAccountSchema = new Schema<UserAccount>({
 		default: "user",
 		required: true,
 	},
+	cvlist: { type: [String], required: false },
+	picture: { type: String, required: false },
 	data: {
 		name: {
 			first: { type: String, required: false },
