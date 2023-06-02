@@ -45,12 +45,23 @@ export async function addTemplate(req: RequestExt, res: ResponseExt) {
 	);
 
 	if (isError(uploadResult))
-		return res
-			.status(404)
-			.json({ status: "error", message: "Could not upload file to firebase" });
+		return res.status(404).json({
+			status: "error",
+			message: "Could not upload request file to firebase",
+		});
 
-	// read file and use cheerio to load it
-	const templateFile = reqFile.data.toString();
+	// read request's file from the file system
+	const templateReadFileResult = await result(readFile(reqFile.tempFilePath));
+
+	if (isError(templateReadFileResult))
+		return res.status(404).json({
+			status: "error",
+			message: "Could not read request file from filesystem",
+		});
+
+	const templateFile = templateReadFileResult.toString();
+
+	// load template file into cheerio document
 	const templateFileAsDocument = load(templateFile);
 
 	// parse data in template file and get template object
@@ -60,9 +71,11 @@ export async function addTemplate(req: RequestExt, res: ResponseExt) {
 	const createResult = await result(templateModel.create(template));
 
 	if (isError(createResult))
-		return res
-			.status(404)
-			.json({ status: "error", message: "Could not add template to db" });
+		return res.status(404).json({
+			status: "error",
+			message: "Could not add template to db",
+			data: createResult.message,
+		});
 
 	// reply with success
 	return res
@@ -88,7 +101,7 @@ export async function deleteTemplate(req: RequestExt, res: ResponseExt) {
 }
 
 export async function generateFromTemplate(req: RequestExt, res: ResponseExt) {
-	// section: get template data from db
+	// SECTION: get template data from db
 
 	const templateId = req.params.id;
 
@@ -105,7 +118,7 @@ export async function generateFromTemplate(req: RequestExt, res: ResponseExt) {
 			.status(404)
 			.json({ status: "error", message: "Could not find template" });
 
-	// section: get user data from db
+	// SECTION: get user data from db
 
 	const user = await result(userAccountModel.findOne({ uid: req.session.uid }));
 
@@ -121,7 +134,7 @@ export async function generateFromTemplate(req: RequestExt, res: ResponseExt) {
 
 	const data = user.data;
 
-	// section: compare template data with user data
+	// SECTION: compare template data with user data
 
 	const flattenedData = flattenObject(data);
 
@@ -134,7 +147,7 @@ export async function generateFromTemplate(req: RequestExt, res: ResponseExt) {
 			data: problems,
 		});
 
-	// section: get template file from firebase storage
+	// SECTION: get template file from firebase storage
 
 	// get template path from db
 	const templatePath = templateData.link;
@@ -177,7 +190,7 @@ export async function generateFromTemplate(req: RequestExt, res: ResponseExt) {
 			.status(404)
 			.json({ status: "error", message: "Could not read downloaded file" });
 
-	// section: insert data into template and convert to pdf
+	// SECTION: insert data into template and convert to pdf
 
 	// read file as string for cheerio
 	const templateAsDocument = load(file.toString());
@@ -188,7 +201,7 @@ export async function generateFromTemplate(req: RequestExt, res: ResponseExt) {
 	// convert to pdf
 	convertHTMLtoPDF(templateAsDocument.html(), templateData.link);
 
-	// section: upload pdf and add link to user data
+	// SECTION: upload pdf and add link to user data
 
 	// upload pdf
 	const uploadResult = await result(firebaseStorage.upload("cv/" + uid(6)));
@@ -215,8 +228,14 @@ export async function generateFromTemplate(req: RequestExt, res: ResponseExt) {
 			.status(404)
 			.json({ status: "error", message: "Could not update user data" });
 
-	// ?? section: delete template file from storage
+	// delete template file from tmp
+	const deleteResult = await result(templateFile.delete());
+
+	if (isError(deleteResult))
+		return res.status(200).json({
+			message: "Successfully generated CV but could not delete file from tmp",
+		});
 
 	// return successfull response
-	return res.status(200).json({ status: "Successfully generated cv" });
+	return res.status(200).json({ message: "Successfully generated cv" });
 }
