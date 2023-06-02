@@ -10,13 +10,13 @@ import { userAccountModel } from "../models/userAccount.model";
 import { isError, result } from "../utils/error";
 import { firebaseStorage } from "../utils/firebase";
 import { RequestExt, ResponseExt } from "../utils/types";
-import { templateValidation } from "../validation/template.validation";
 import { load } from "cheerio";
 import { convertHTMLtoPDF } from "../generator/converter";
 import { uid } from "uid";
 
 export async function getAllTemplates(req: RequestExt, res: ResponseExt) {
 	const template = await result(templateModel.find());
+
 	if (isError(template))
 		return res
 			.status(404)
@@ -78,6 +78,7 @@ export async function deleteTemplate(req: RequestExt, res: ResponseExt) {
 	const template = await result(
 		templateModel.deleteOne({ _id: req.params.id }),
 	);
+
 	if (isError(template))
 		return res
 			.status(404)
