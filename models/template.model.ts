@@ -18,7 +18,8 @@ const templateSchema = new Schema<Template>({
 	fields: [
 		{
 			id: { type: String, required: true },
-			char_limit: { type: Number, required: true },
+			length: { type: Number, required: true },
+			type: { type: String, required: true },
 		},
 	],
 	preview: { type: String, required: false },
