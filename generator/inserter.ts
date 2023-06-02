@@ -40,7 +40,7 @@ export function handleRepeats(doc: CheerioAPI) {
 	});
 }
 
-export function insertData(doc: CheerioAPI, data: any) {
+export function insertData(doc: CheerioAPI, data: any, picture: string) {
 	handleRepeats(doc);
 
 	doc("[id]").each((_, element) => {
@@ -50,12 +50,23 @@ export function insertData(doc: CheerioAPI, data: any) {
 
 		// get the value to insert at the id
 		let dataValue = data[elementId];
-		if (!dataValue) return;
 
-		// insert the data
+		if (!dataValue && elementId !== "picture") return;
+
+		// inserting pictures
+		if (elementId === "picture") {
+			dataValue = picture;
+
+			log(`LOG: Inserting ${dataValue} into ${elementId}`);
+
+			doc(element).attr("src", dataValue);
+
+			return;
+		}
 
 		log(`LOG: Inserting ${dataValue} into ${elementId}`);
 
+		// inserting data
 		doc(element).text(dataValue);
 	});
 }

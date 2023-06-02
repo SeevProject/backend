@@ -51,7 +51,9 @@ export function parseTemplate(doc: CheerioAPI, link: string): TemplateType {
 
 		const elementType = doc(element).attr("type");
 
-		if (elementType !== "string" && elementType !== "number")
+		if (elementType !== "string" && elementType !== "number" && elementType !== "boolean" && 
+		elementType !== "picture"
+		)
 			newField.type = "unknown";
 		else newField.type = elementType;
 
@@ -63,7 +65,11 @@ export function parseTemplate(doc: CheerioAPI, link: string): TemplateType {
 }
 
 // function that compares a data object to a template
-export function getCompatability(data: any, template: TemplateType) {
+export function getCompatability(
+	data: any,
+	pictureLink: string,
+	template: TemplateType,
+) {
 	const problems: {
 		field: string;
 		message: string;
@@ -71,7 +77,7 @@ export function getCompatability(data: any, template: TemplateType) {
 
 	for (const field of template.fields) {
 		// compare each property on the field to the data object
-		if (data[field.id] === undefined) {
+		if (data[field.id] === undefined && field.id !== "picture") {
 			problems.push({
 				field: field.id,
 				message: `Field ${field.id} is missing from data`,
@@ -79,7 +85,7 @@ export function getCompatability(data: any, template: TemplateType) {
 			continue;
 		}
 
-		if (typeof data[field.id] !== field.type) {
+		if (typeof data[field.id] !== field.type && field.id !== "picture") {
 			problems.push({
 				field: field.id,
 				message: `Field ${field.id} is of type ${typeof data[
@@ -89,7 +95,11 @@ export function getCompatability(data: any, template: TemplateType) {
 			continue;
 		}
 
-		if (field.length !== 0 && data[field.id].length > field.length) {
+		if (
+			field.length !== 0 &&
+			data[field.id].length > field.length &&
+			field.id !== "picture"
+		) {
 			problems.push({
 				field: field.id,
 				message: `Field ${field.id} has a length of ${
@@ -97,6 +107,16 @@ export function getCompatability(data: any, template: TemplateType) {
 				} but should have a length of ${field.length}`,
 			});
 			continue;
+		}
+
+		if (field.id === "picture") {
+			if (pictureLink === "") {
+				problems.push({
+					field: field.id,
+					message: `Field ${field.id} is missing from data`,
+				});
+				continue;
+			}
 		}
 	}
 

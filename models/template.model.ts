@@ -5,7 +5,7 @@ export interface TemplateType {
 	fields: {
 		id: string;
 		length: number;
-		type: "string" | "number" | "unknown";
+		type: "string" | "number" | "picture" | "unknown" | "boolean";
 	}[];
 	preview: string;
 }

@@ -132,13 +132,11 @@ export async function generateFromTemplate(req: RequestExt, res: ResponseExt) {
 			.status(404)
 			.json({ status: "error", message: "Could not find user in db" });
 
-	const data = user.data;
-
 	// SECTION: compare template data with user data
 
-	const flattenedData = flattenObject(data);
+	const flattenedData = flattenObject(user.data);
 
-	const problems = getCompatability(flattenedData, templateData);
+	const problems = getCompatability(flattenedData, user.picture, templateData);
 
 	if (problems.length > 0)
 		return res.status(400).json({
@@ -196,7 +194,7 @@ export async function generateFromTemplate(req: RequestExt, res: ResponseExt) {
 	const templateAsDocument = load(file.toString());
 
 	// insert data into template
-	insertData(templateAsDocument, flattenedData);
+	insertData(templateAsDocument, flattenedData, user.picture);
 
 	// convert to pdf
 	convertHTMLtoPDF(templateAsDocument.html(), templateData.link);
