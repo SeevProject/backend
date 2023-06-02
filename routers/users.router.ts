@@ -3,6 +3,7 @@ import {
 	getAllUsers,
 	getUserData,
 	updateUserData,
+	updateUserPicture,
 } from "../controllers/users.controller";
 import { requiresAdmin, requiresSession } from "../middleware/auth.middleware";
 
@@ -12,5 +13,6 @@ export const usersRouter = Router();
 
 usersRouter
 	.get("/me", requiresSession, getUserData)
-	.put("/me", requiresSession, updateUserData)
+	.put("/me/data", requiresSession, updateUserData)
+	.put("/me/picture", requiresSession, updateUserPicture)
 	.get("/", requiresSession, requiresAdmin, getAllUsers);
