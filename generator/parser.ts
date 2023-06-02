@@ -32,21 +32,31 @@ export function parseTemplate(doc: CheerioAPI, link: string): TemplateType {
 	};
 
 	doc("[id]").each((index, element) => {
+		// prepare new field
+		let newField: TemplateType["fields"][0] = {
+			id: "",
+			length: 0,
+			type: "unknown",
+		};
+
 		// get element id
 		const elementId = doc(element).attr("id");
 
-		template.fields[index].id = elementId as string;
+		newField.id = elementId as string;
 
 		const elementLength = doc(element).attr("length");
 
-		if (!elementLength) template.fields[index].length = 0;
-		else template.fields[index].length = parseInt(elementLength);
+		if (!elementLength) newField.length = 0;
+		else newField.length = parseInt(elementLength);
 
 		const elementType = doc(element).attr("type");
 
 		if (elementType !== "string" && elementType !== "number")
-			template.fields[index].type = "unknown";
-		else template.fields[index].type = elementType;
+			newField.type = "unknown";
+		else newField.type = elementType;
+
+		// add new field to template
+		template.fields.push(newField);
 	});
 
 	return template;
