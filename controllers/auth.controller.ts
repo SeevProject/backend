@@ -94,6 +94,7 @@ export async function register(req: RequestExt, res: ResponseExt) {
 				uid: tokenData?.uid,
 				createdAt: new Date().toString(),
 				type: "user",
+				cvlist: [],
 			});
 		}
 
