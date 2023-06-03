@@ -211,11 +211,8 @@ export async function generateFromTemplate(req: RequestExt, res: ResponseExt) {
 	const userUpdateResult = await result(
 		userAccountModel.updateOne(
 			{ uid: req.session.uid },
-			{
-				$push: {
-					cvlinks: firebaseLink,
-				},
-			},
+			{ $push: { cvlist: firebaseLink } },
+			{ new: true },
 		),
 	);
 
