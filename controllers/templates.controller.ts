@@ -152,7 +152,7 @@ export async function updateTemplate(req: RequestExt, res: ResponseExt) {
 	// reply with success
 	return res
 		.status(200)
-		.json({ status: "Added template to db", data: updateResult });
+		.json({ status: "Updated template in db", data: updateResult });
 }
 
 export async function deleteTemplate(req: RequestExt, res: ResponseExt) {
@@ -194,12 +194,10 @@ export async function deleteTemplate(req: RequestExt, res: ResponseExt) {
 			.status(404)
 			.json({ status: "error", message: "Could not update template data" });
 
-	return res
-		.status(200)
-		.json({
-			status: "sucsess",
-			message: "template deleted from db and firebase files",
-		});
+	return res.status(200).json({
+		status: "sucsess",
+		message: "template deleted from db and firebase files",
+	});
 }
 
 export async function generateFromTemplate(req: RequestExt, res: ResponseExt) {
