@@ -36,7 +36,7 @@ export async function addTemplate(req: RequestExt, res: ResponseExt) {
 	if (Array.isArray(reqFile))
 		return res.status(400).json({ status: "Submit only one file" });
 
-	const firebaseLink = `templates/${uid(10)}.html`;
+	const firebaseLink = `templates/${uid(18)}.html`;
 
 	// upload file to firebase
 	const uploadResult = await result(
@@ -186,7 +186,7 @@ export async function generateFromTemplate(req: RequestExt, res: ResponseExt) {
 	// insert data into template
 	insertData(templateAsDocument, flattenedData, user.picture);
 
-	const fileName = uid(10);
+	const fileName = uid(18);
 	const localLink = path.join(__dirname, "..", `tmp/${fileName}.pdf`);
 	const firebaseLink = `cv/${fileName}.pdf`;
 
