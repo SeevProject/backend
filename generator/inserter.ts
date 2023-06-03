@@ -57,14 +57,10 @@ export function insertData(doc: CheerioAPI, data: any, picture: string) {
 		if (elementId === "picture") {
 			dataValue = picture;
 
-			log(`LOG: Inserting ${dataValue} into ${elementId}`);
-
 			doc(element).attr("src", dataValue);
 
 			return;
 		}
-
-		log(`LOG: Inserting ${dataValue} into ${elementId}`);
 
 		// inserting data
 		doc(element).text(dataValue);
