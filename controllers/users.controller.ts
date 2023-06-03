@@ -50,7 +50,7 @@ export async function updateUserPicture(req: RequestExt, res: ResponseExt) {
 
 	// upload file to firebase
 
-	const firebaseLink = `users/${userId}/profilePicture${
+	const firebaseLink = `users/${userId}/picture${
 		reqFile.mimetype === "image/jpeg" ? ".jpg" : ".png"
 	}`;
 
