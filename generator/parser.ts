@@ -17,6 +17,9 @@ export function flattenObject(obj: Object) {
 
 				if (typeof value2 === "object") {
 					for (let property3 in value2) {
+						// skip properties with the name "_id"
+						if (property3 === "_id") continue;
+
 						const value3 = value2[property3];
 
 						if (Array.isArray(value3)) {
@@ -40,6 +43,9 @@ export function flattenObject(obj: Object) {
 		// if key is an object
 		if (typeof value === "object") {
 			for (let property2 in value) {
+				// skip properties with the name "_id"
+				if (property2 === "_id") continue;
+
 				const value2 = value[property2];
 
 				flattened[`${property}.${property2}`] = value2;

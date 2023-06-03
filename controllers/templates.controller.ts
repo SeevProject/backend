@@ -134,7 +134,9 @@ export async function generateFromTemplate(req: RequestExt, res: ResponseExt) {
 
 	// SECTION: compare template data with user data
 
-	const flattenedData = flattenObject(user.data);
+	const flattenedData = flattenObject(user.toObject().data);
+
+	console.log(flattenedData);
 
 	const problems = getCompatability(flattenedData, user.picture, templateData);
 
