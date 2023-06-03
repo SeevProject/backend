@@ -156,16 +156,50 @@ export async function updateTemplate(req: RequestExt, res: ResponseExt) {
 }
 
 export async function deleteTemplate(req: RequestExt, res: ResponseExt) {
-	const template = await result(
-		templateModel.deleteOne({ _id: req.params.id }),
+	const templateId = req.params.id;
+
+	// get template data
+	const templateData = await result(templateModel.findOne({ _id: templateId }));
+
+	if (isError(templateData))
+		return res
+			.status(404)
+			.json({ status: "error", message: "Could not perform search to delete" });
+
+	if (!templateData)
+		return res
+			.status(404)
+			.json({ status: "error", message: "Could not find template to delete" });
+
+	// if a file is attached to a template
+	if (templateData.link) {
+		// delete template file from firebase
+		const deleteResult = await result(
+			firebaseStorage.file(templateData.link).delete(),
+		);
+
+		if (isError(deleteResult))
+			return res.status(404).json({
+				status: "error",
+				message: "Could not delete template file from firebase",
+			});
+	}
+
+	const deleteResult = await result(
+		templateModel.deleteOne({ _id: templateId }),
 	);
 
-	if (isError(template))
+	if (isError(deleteResult))
 		return res
 			.status(404)
 			.json({ status: "error", message: "Could not update template data" });
 
-	return res.status(200).json({ status: "sucsess", data: template });
+	return res
+		.status(200)
+		.json({
+			status: "sucsess",
+			message: "template deleted from db and firebase files",
+		});
 }
 
 export async function generateFromTemplate(req: RequestExt, res: ResponseExt) {
