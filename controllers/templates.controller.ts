@@ -85,7 +85,74 @@ export async function addTemplate(req: RequestExt, res: ResponseExt) {
 }
 
 export async function updateTemplate(req: RequestExt, res: ResponseExt) {
-	return null;
+	const templateId = req.params.templateId;
+
+	// try to find template in db using id
+	const findResult = templateModel.findById(templateId);
+
+	if (isError(findResult))
+		return res.status(404).json({
+			status: "error",
+			message: "Could not find specified template in db",
+		});
+
+	// see if template is attached
+	if (!req.files)
+		return res.status(400).json({ status: "Could not find submitted file" });
+
+	// get file from request
+	const reqFile = req.files.template;
+
+	if (Array.isArray(reqFile))
+		return res.status(400).json({ status: "Submit only one file" });
+
+	const firebaseLink = `templates/${uid(18)}.html`;
+
+	// upload file to firebase
+	const uploadResult = await result(
+		firebaseStorage.upload(reqFile.tempFilePath, {
+			destination: firebaseLink,
+		}),
+	);
+
+	if (isError(uploadResult))
+		return res.status(404).json({
+			status: "error",
+			message: "Could not upload request file to firebase",
+		});
+
+	// read request's file from the file system
+	const templateReadFileResult = await result(readFile(reqFile.tempFilePath));
+
+	if (isError(templateReadFileResult))
+		return res.status(404).json({
+			status: "error",
+			message: "Could not read request file from filesystem",
+		});
+
+	const templateFile = templateReadFileResult.toString();
+
+	// load template file into cheerio document
+	const templateFileAsDocument = load(templateFile);
+
+	// parse data in template file and get template object
+	const template = parseTemplate(templateFileAsDocument, firebaseLink);
+
+	// add template object to to db
+	const updateResult = await result(
+		templateModel.updateOne({ _id: templateId }, template),
+	);
+
+	if (isError(updateResult))
+		return res.status(404).json({
+			status: "error",
+			message: "Could not add template to db",
+		});
+
+	// reply with success
+	return res
+		.status(200)
+		.json({ status: "Added template to db", data: updateResult });
 }
 
 export async function deleteTemplate(req: RequestExt, res: ResponseExt) {
