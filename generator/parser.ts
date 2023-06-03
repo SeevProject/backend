@@ -1,29 +1,58 @@
 import { CheerioAPI } from "cheerio";
 import { TemplateType } from "../models/template.model";
 
-// function that flattens an object to a single level
-// turns { a: { b: { c: 1 } } } into { a.b.c: 1 }
-export function flattenObject(obj: any) {
-	const flattenedObject: any = {};
-	const stack: any[] = [{ obj, prefix: "" }];
+export function flattenObject(obj: Object) {
+	let flattened = {};
 
-	while (stack.length > 0) {
-		const { obj, prefix } = stack.pop();
+	for (let property in obj) {
+		const value = obj[property];
 
-		Object.keys(obj).forEach((key) => {
-			const value = obj[key];
+		// skip properties with the name "_id"
+		if (property === "_id") continue;
 
-			if (typeof value === "object") {
-				stack.push({ obj: value, prefix: `${prefix}${key}.` });
-			} else {
-				flattenedObject[`${prefix}${key}`] = value;
+		// if key is an array
+		if (Array.isArray(value)) {
+			for (let index = 0; index < value.length; index++) {
+				const value2 = value[index];
+
+				if (typeof value2 === "object") {
+					for (let property3 in value2) {
+						const value3 = value2[property3];
+
+						if (Array.isArray(value3)) {
+							for (let index2 = 0; index2 < value3.length; index2++) {
+								const value4 = value3[index2];
+
+								flattened[`${property}.${index}.${property3}.${index2}`] =
+									value4;
+							}
+							continue;
+						}
+
+						flattened[`${property}.${index}.${property3}`] = value3;
+					}
+					continue;
+				}
 			}
-		});
+			continue;
+		}
+
+		// if key is an object
+		if (typeof value === "object") {
+			for (let property2 in value) {
+				const value2 = value[property2];
+
+				flattened[`${property}.${property2}`] = value2;
+			}
+			continue;
+		}
+
+		// if key is a value
+		flattened[property] = value;
 	}
 
-	return flattenedObject;
+	return flattened;
 }
-
 
 // function that parses a template from a cheerio document
 export function parseTemplate(doc: CheerioAPI, link: string): TemplateType {
@@ -53,8 +82,11 @@ export function parseTemplate(doc: CheerioAPI, link: string): TemplateType {
 
 		const elementType = doc(element).attr("type");
 
-		if (elementType !== "string" && elementType !== "number" && elementType !== "boolean" && 
-		elementType !== "picture"
+		if (
+			elementType !== "string" &&
+			elementType !== "number" &&
+			elementType !== "boolean" &&
+			elementType !== "picture"
 		)
 			newField.type = "unknown";
 		else newField.type = elementType;

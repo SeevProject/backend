@@ -20,21 +20,19 @@ export async function generateCV(
 
 	let template = parseTemplate(document, templatePath);
 
-	console.log(template);
-
 	let flattenedData = flattenObject(data);
 
 	let problems = getCompatability(flattenedData, pictureLink, template);
 
-	console.log(problems);
+	// console.log(problems);
 
 	// inserter
 
-	insertData(document, flattenObject(data), pictureLink);
+	// insertData(document, flattenObject(data), pictureLink);
 
 	// converter
 
-	const pdf = await convertHTMLtoPDF(document.html(), __dirname + "/cv.pdf");
+	// await convertHTMLtoPDF(document.html(), __dirname + "/cv.pdf");
 }
 
-generateCV(userData, __dirname + "/profile.jpg", __dirname + "/cv.html");
+generateCV(userData, "./profile.jpg", __dirname + "/cv.html");
