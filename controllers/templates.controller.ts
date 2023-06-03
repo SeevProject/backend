@@ -1,4 +1,4 @@
-import { readFile } from "fs/promises";
+import { readFile, rm } from "fs/promises";
 import { insertData } from "../generator/inserter";
 import {
 	flattenObject,
@@ -13,6 +13,7 @@ import { RequestExt, ResponseExt } from "../utils/types";
 import { load } from "cheerio";
 import { convertHTMLtoPDF } from "../generator/converter";
 import { uid } from "uid";
+import path from "path";
 
 export async function getAllTemplates(req: RequestExt, res: ResponseExt) {
 	const template = await result(templateModel.find());
@@ -133,10 +134,7 @@ export async function generateFromTemplate(req: RequestExt, res: ResponseExt) {
 			.json({ status: "error", message: "Could not find user in db" });
 
 	// SECTION: compare template data with user data
-
 	const flattenedData = flattenObject(user.toObject().data);
-
-	console.log(flattenedData);
 
 	const problems = getCompatability(flattenedData, user.picture, templateData);
 
@@ -164,31 +162,21 @@ export async function generateFromTemplate(req: RequestExt, res: ResponseExt) {
 			message: "Could not use link to search for file in storage",
 		});
 
-	if (!fileExists)
+	if (!fileExists[0])
 		return res
 			.status(404)
 			.json({ status: "error", message: "Could not find file in storage" });
 
 	// download file
-	const downloadResult = await result(
-		templateFile.download({
-			destination: templateData.link,
-		}),
-	);
+	const downloadResult = await result(templateFile.download());
 
 	if (isError(downloadResult))
 		return res.status(404).json({
 			status: "error",
-			message: "Could not download file from storage",
+			message: "Could not download file from storage" + downloadResult.message,
 		});
 
-	// read downloaded file
-	const file = await result(readFile(templateData.link));
-
-	if (isError(file))
-		return res
-			.status(404)
-			.json({ status: "error", message: "Could not read downloaded file" });
+	const file = downloadResult[0];
 
 	// SECTION: insert data into template and convert to pdf
 
@@ -198,13 +186,21 @@ export async function generateFromTemplate(req: RequestExt, res: ResponseExt) {
 	// insert data into template
 	insertData(templateAsDocument, flattenedData, user.picture);
 
+	const fileName = uid(10);
+	const localLink = path.join(__dirname, "..", `tmp/${fileName}.pdf`);
+	const firebaseLink = `cv/${fileName}.pdf`;
+
 	// convert to pdf
-	convertHTMLtoPDF(templateAsDocument.html(), templateData.link);
+	await convertHTMLtoPDF(templateAsDocument.html(), localLink);
 
 	// SECTION: upload pdf and add link to user data
 
 	// upload pdf
-	const uploadResult = await result(firebaseStorage.upload("cv/" + uid(6)));
+	const uploadResult = await result(
+		firebaseStorage.upload(localLink, {
+			destination: firebaseLink,
+		}),
+	);
 
 	if (isError(uploadResult))
 		return res
@@ -217,7 +213,7 @@ export async function generateFromTemplate(req: RequestExt, res: ResponseExt) {
 			{ uid: req.session.uid },
 			{
 				$push: {
-					cvlinks: uploadResult[0].metadata.mediaLink,
+					cvlinks: firebaseLink,
 				},
 			},
 		),
@@ -229,7 +225,7 @@ export async function generateFromTemplate(req: RequestExt, res: ResponseExt) {
 			.json({ status: "error", message: "Could not update user data" });
 
 	// delete template file from tmp
-	const deleteResult = await result(templateFile.delete());
+	const deleteResult = await result(rm(localLink));
 
 	if (isError(deleteResult))
 		return res.status(200).json({
