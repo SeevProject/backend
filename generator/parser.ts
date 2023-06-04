@@ -150,7 +150,7 @@ export function getCompatability(
 		}
 
 		if (field.id === "picture") {
-			if (pictureLink === "") {
+			if (!pictureLink) {
 				problems.push({
 					field: field.id,
 					message: `Field ${field.id} is missing from data`,
