@@ -1,5 +1,4 @@
 import { CheerioAPI } from "cheerio";
-import { log } from "console";
 
 export function handleRepeats(doc: CheerioAPI) {
 	// go through all elements with repeat attribute

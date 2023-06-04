@@ -6,7 +6,6 @@ export const userData = {
 	},
 	phone: "23456789",
 	email: "john.doe@example.com",
-	picture: "https://example.com/profile_picture.jpg",
 	about: "I am a passionate and experienced software developer.",
 	status: {
 		employed: true,
