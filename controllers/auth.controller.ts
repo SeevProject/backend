@@ -67,7 +67,6 @@ export async function register(req: RequestExt, res: ResponseExt) {
 			.status(401)
 			.json({ message: "You already got an account, cannot make another" });
 
-
 	// // create user account in database
 	// const createdAccount = await result(
 	// 	// use accountModel as it supports both user types
@@ -79,24 +78,25 @@ export async function register(req: RequestExt, res: ResponseExt) {
 	// 	}),
 	// );
 
-	 let createdAccount;
+	let createdAccount;
 
-		if (validBody.type == "company") {
-			createdAccount = companyAccountModel.create({
-				username: validBody.username,
-				uid: tokenData?.uid,
-				createdAt: new Date().toString(),
-				type: "company",
-			});
-		} else {
-			createdAccount = userAccountModel.create({
-				username: validBody.username,
-				uid: tokenData?.uid,
-				createdAt: new Date().toString(),
-				type: "user",
-				cvlist: [],
-			});
-		}
+	if (validBody.type == "company") {
+		createdAccount = companyAccountModel.create({
+			username: validBody.username,
+			uid: tokenData?.uid,
+			createdAt: new Date().toString(),
+			type: "company",
+			approved: false,
+		});
+	} else {
+		createdAccount = userAccountModel.create({
+			username: validBody.username,
+			uid: tokenData?.uid,
+			createdAt: new Date().toString(),
+			type: "user",
+			cvlist: [],
+		});
+	}
 
 	// if could not create account, return error
 	if (isError(createdAccount))
