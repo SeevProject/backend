@@ -12,6 +12,7 @@ import { rateLimit } from "express-rate-limit";
 import { loadEnv } from "./utils/env";
 import { env } from "./utils/env";
 import fileUpload from "express-fileupload";
+import expressRequestsLogger from "express-requests-logger";
 
 // import env variables
 loadEnv();
@@ -75,6 +76,9 @@ app.use(
 			fileSize: 10 * 1024 * 1024 * 1024, // 10MB max file(s) size
 		},
 	}),
+
+	// logging requests
+	expressRequestsLogger(),
 );
 
 // set server port
