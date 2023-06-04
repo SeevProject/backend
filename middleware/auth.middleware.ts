@@ -20,17 +20,14 @@ export async function requiresToken(
 	// provide a uid in the body
 	// if in dev mode do not read tokens
 	if (env.DEV) {
-		if (!req.body.uid)
-			return res.status(400).json({
-				message: "DEV MODE: Please add a uid in the body of the request",
-			});
+		if (req.body.uid) {
+			req.tokenData = {
+				uid: req.body.uid,
+			};
 
-		req.tokenData = {
-			uid: req.body.uid,
-		};
-
-		next();
-		return;
+			next();
+			return;
+		}
 	}
 	// TESTING CODE END
 
@@ -89,7 +86,7 @@ export async function requiresAdmin(
 			uid: req.session.uid,
 		}),
 	);
- 
+
 	// if got error while finding account, return error
 	if (isError(adminAccount))
 		return res
