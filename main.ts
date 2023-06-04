@@ -35,8 +35,7 @@ app.use(
 	// cors for cross origin
 	cors({
 		credentials: true,
-		// TODO change to domain later
-		origin: env.DEV ? "*" : "*",
+		origin: env.DEV ? "*" : "https://seev-backend.ahmed.systems/",
 		methods: ["GET", "POST", "PUT", "DELETE"],
 	}),
 
@@ -46,7 +45,7 @@ app.use(
 		windowMs: 5 * 60 * 1000, // per 15 minutes
 		standardHeaders: true,
 		legacyHeaders: false,
-		message: "Too many requests from this IP",
+		message: "You've sent too many requests later",
 	}),
 
 	// session for cookies
@@ -63,7 +62,6 @@ app.use(
 			httpOnly: true,
 			sameSite: "lax",
 			maxAge: 1000 * 60 * 60 * 24 * 3,
-			// TODO set to secure
 			secure: env.DEV ? false : true,
 		},
 	}),
@@ -72,12 +70,13 @@ app.use(
 	fileUpload({
 		createParentPath: true,
 		useTempFiles: true,
+		safeFileNames: true,
 		limits: {
-			fileSize: 10 * 1024 * 1024 * 1024, // 10MB max file(s) size
+			fileSize: 10 * 1024 * 1024 * 1024, // 2MB max file(s) size
 		},
 	}),
 
-	// logging requests
+	// logging requests/responses
 	expressRequestsLogger(),
 );
 
