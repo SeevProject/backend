@@ -275,15 +275,32 @@ export async function generateFromTemplate(req: RequestExt, res: ResponseExt) {
 			message: "Could not download file from storage" + downloadResult.message,
 		});
 
-	const file = downloadResult[0];
+	const fileBuffer = downloadResult[0];
 
 	// SECTION: insert data into template and convert to pdf
 
-	// read file as string for cheerio
-	const templateAsDocument = load(file.toString());
+	// get user picture from firebase
+	const pictureFile = firebaseStorage.file(user.picture);
 
-	// insert data into template
-	insertData(templateAsDocument, flattenedData, user.picture);
+	// make file publicly available
+	const makePublicResult = await result(pictureFile.makePublic());
+
+	if (isError(makePublicResult))
+		return res.status(404).json({
+			status: "error",
+			message: "Could not make user picture public",
+		});
+
+	// get public link
+	const picturePublicLink = pictureFile.publicUrl();
+
+	console.log(picturePublicLink);
+
+	// read file as string for cheerio
+	const templateAsDocument = load(fileBuffer.toString());
+
+	// insert data and picture link into template
+	insertData(templateAsDocument, flattenedData, picturePublicLink);
 
 	const fileName = uid(18);
 	const localLink = path.join(__dirname, "..", `tmp/${fileName}.pdf`);
@@ -291,6 +308,15 @@ export async function generateFromTemplate(req: RequestExt, res: ResponseExt) {
 
 	// convert to pdf
 	await convertHTMLtoPDF(templateAsDocument.html(), localLink);
+
+	// make picture private again
+	const makePrivateResult = await result(pictureFile.makePrivate());
+
+	if (isError(makePrivateResult))
+		return res.status(404).json({
+			status: "error",
+			message: "Could not make user picture private",
+		});
 
 	// SECTION: upload pdf and add link to user data
 
