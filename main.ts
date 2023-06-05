@@ -59,10 +59,10 @@ app.use(
 			dbName: "testing",
 		}),
 		cookie: {
-			httpOnly: false,
+			httpOnly: true,
 			sameSite: "lax",
 			maxAge: 1000 * 60 * 60 * 24 * 3,
-			secure: true,
+			secure: false,
 		},
 	}),
 
