@@ -14,27 +14,31 @@ import { load } from "cheerio";
 import { convertHTMLtoPDF } from "../generator/converter";
 import { uid } from "uid";
 import path from "path";
+import { failResponse, successResponse } from "../utils/response";
 
 export async function getAllTemplates(req: RequestExt, res: ResponseExt) {
-	const template = await result(templateModel.find());
+	const templateResult = await result(templateModel.find());
 
-	if (isError(template))
-		return res
-			.status(404)
-			.json({ status: "error", message: "Could not return templates " });
+	if (isError(templateResult))
+		return failResponse(res, 404, "Failed to return templates", templateResult);
 
-	return res.status(200).json({ status: "sucsess", data: template });
+	return successResponse(
+		res,
+		200,
+		"Succeded in returning templates",
+		templateResult,
+	);
 }
 
 export async function addTemplate(req: RequestExt, res: ResponseExt) {
 	if (!req.files)
-		return res.status(400).json({ status: "Could not find submitted file" });
+		return failResponse(res, 400, "Failed to find submitted file");
 
 	// get file from request
 	const reqFile = req.files.template;
 
 	if (Array.isArray(reqFile))
-		return res.status(400).json({ status: "Submit only one file" });
+		return failResponse(res, 400, "Failed to find submitted file");
 
 	const firebaseLink = `templates/${uid(18)}.html`;
 
@@ -46,19 +50,23 @@ export async function addTemplate(req: RequestExt, res: ResponseExt) {
 	);
 
 	if (isError(uploadResult))
-		return res.status(404).json({
-			status: "error",
-			message: "Could not upload request file to firebase",
-		});
+		return failResponse(
+			res,
+			500,
+			"Failed to upload submitted file",
+			uploadResult,
+		);
 
 	// read request's file from the file system
 	const templateReadFileResult = await result(readFile(reqFile.tempFilePath));
 
 	if (isError(templateReadFileResult))
-		return res.status(404).json({
-			status: "error",
-			message: "Could not read request file from filesystem",
-		});
+		return failResponse(
+			res,
+			404,
+			"Failed to read submitted file",
+			templateReadFileResult,
+		);
 
 	const templateFile = templateReadFileResult.toString();
 
@@ -72,16 +80,20 @@ export async function addTemplate(req: RequestExt, res: ResponseExt) {
 	const createResult = await result(templateModel.create(template));
 
 	if (isError(createResult))
-		return res.status(404).json({
-			status: "error",
-			message: "Could not add template to db",
-			data: createResult.message,
-		});
+		return failResponse(
+			res,
+			404,
+			"Failed to add template to database",
+			createResult,
+		);
 
 	// reply with success
-	return res
-		.status(200)
-		.json({ status: "Added template to db", data: createResult });
+	return successResponse(
+		res,
+		200,
+		"Succeded in adding template to database",
+		createResult,
+	);
 }
 
 export async function updateTemplate(req: RequestExt, res: ResponseExt) {
@@ -91,20 +103,22 @@ export async function updateTemplate(req: RequestExt, res: ResponseExt) {
 	const findResult = templateModel.findById(templateId);
 
 	if (isError(findResult))
-		return res.status(404).json({
-			status: "error",
-			message: "Could not find specified template in db",
-		});
+		return failResponse(
+			res,
+			404,
+			"Failed to find specified template in db",
+			findResult,
+		);
 
 	// see if template is attached
 	if (!req.files)
-		return res.status(400).json({ status: "Could not find submitted file" });
+		return failResponse(res, 400, "Failed to find submitted file");
 
 	// get file from request
 	const reqFile = req.files.template;
 
 	if (Array.isArray(reqFile))
-		return res.status(400).json({ status: "Submit only one file" });
+		return failResponse(res, 400, "Failed to find submitted file");
 
 	const firebaseLink = `templates/${uid(18)}.html`;
 
@@ -116,19 +130,23 @@ export async function updateTemplate(req: RequestExt, res: ResponseExt) {
 	);
 
 	if (isError(uploadResult))
-		return res.status(404).json({
-			status: "error",
-			message: "Could not upload request file to firebase",
-		});
+		return failResponse(
+			res,
+			404,
+			"Failed to upload submitted file",
+			uploadResult,
+		);
 
 	// read request's file from the file system
 	const templateReadFileResult = await result(readFile(reqFile.tempFilePath));
 
 	if (isError(templateReadFileResult))
-		return res.status(404).json({
-			status: "error",
-			message: "Could not read request file from filesystem",
-		});
+		return failResponse(
+			res,
+			404,
+			"Failed to read submitted file",
+			templateReadFileResult,
+		);
 
 	const templateFile = templateReadFileResult.toString();
 
@@ -144,15 +162,20 @@ export async function updateTemplate(req: RequestExt, res: ResponseExt) {
 	);
 
 	if (isError(updateResult))
-		return res.status(404).json({
-			status: "error",
-			message: "Could not add template to db",
-		});
+		return failResponse(
+			res,
+			404,
+			"Failed to update template in db",
+			updateResult,
+		);
 
 	// reply with success
-	return res
-		.status(200)
-		.json({ status: "Updated template in db", data: updateResult });
+	return successResponse(
+		res,
+		200,
+		"Succeded in updating template in db",
+		updateResult,
+	);
 }
 
 export async function deleteTemplate(req: RequestExt, res: ResponseExt) {
