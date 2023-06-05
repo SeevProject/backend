@@ -27,7 +27,7 @@ export interface UserAccount extends Account {
 		};
 		languages: {
 			name: string;
-			level: string;
+			level: number;
 		}[];
 		education: {
 			facility: string;
@@ -36,6 +36,7 @@ export interface UserAccount extends Account {
 			degree_field: string;
 			date_start: string;
 			date_end: string;
+			about: string;
 		}[];
 		courses: {
 			title: string;
@@ -86,7 +87,7 @@ const userAccountSchema = new Schema<UserAccount>({
 		languages: [
 			{
 				name: { type: String, required: false },
-				level: { type: String, required: false },
+				level: { type: Number, required: false },
 			},
 		],
 		education: [
@@ -97,6 +98,7 @@ const userAccountSchema = new Schema<UserAccount>({
 				degree_field: { type: String, required: false },
 				date_start: { type: String, required: false },
 				date_end: { type: String, required: false },
+				about: { type: String, required: false },
 			},
 		],
 		courses: [

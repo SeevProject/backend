@@ -31,7 +31,7 @@ export const userValidation = (body: any) => {
 					z
 						.object({
 							name: z.string().optional(),
-							level: z.string().optional(),
+							level: z.number().min(1).max(5).optional(),
 						})
 						.optional(),
 				)
@@ -46,6 +46,7 @@ export const userValidation = (body: any) => {
 							degree_field: z.string().optional(),
 							date_start: z.string().optional(),
 							date_end: z.string().optional(),
+							about: z.string().optional(),
 						})
 						.optional(),
 				)
@@ -68,7 +69,7 @@ export const userValidation = (body: any) => {
 						.object({
 							name: z.string().optional(),
 							about: z.string().optional(),
-							level: z.number().optional(),
+							level: z.number().min(1).max(5).optional(),
 						})
 						.optional(),
 				)
