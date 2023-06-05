@@ -120,7 +120,7 @@ export function getCompatability(
 		if (data[field.id] === undefined && field.id !== "picture") {
 			problems.push({
 				field: field.id,
-				message: `Template has field <${field.id}> but user data does not.`,
+				message: `Template: field exists <=> UserData: not found`,
 			});
 			continue;
 		}
@@ -128,9 +128,9 @@ export function getCompatability(
 		if (typeof data[field.id] !== field.type && field.id !== "picture") {
 			problems.push({
 				field: field.id,
-				message: `Template field <${field.id}> type is ${
+				message: `Template: field type is ${
 					field.type
-				} but user data field type is ${typeof data[field.id]}.`,
+				} <=> UserData: type is ${typeof data[field.id]}.`,
 			});
 			continue;
 		}
@@ -142,9 +142,9 @@ export function getCompatability(
 		) {
 			problems.push({
 				field: field.id,
-				message: `Template field ${field.id} length is ${
+				message: `Template: field max length is ${
 					field.length
-				} but user data length is of ${data[field.id].length}.`,
+				} <=> UserData: length is ${data[field.id].length}.`,
 			});
 			continue;
 		}
@@ -153,7 +153,7 @@ export function getCompatability(
 			if (!pictureLink) {
 				problems.push({
 					field: field.id,
-					message: `Template has field ${field.id} but user data does not.`,
+					message: `Template: field exists <=> UserData: not found`,
 				});
 				continue;
 			}
