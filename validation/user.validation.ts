@@ -84,6 +84,19 @@ export const userValidation = (body: any) => {
 						.optional(),
 				)
 				.optional(),
+			experiences: z
+				.array(
+					z
+						.object({
+							employer: z.string().optional(),
+							position: z.string().optional(),
+							date_start: z.string().optional(),
+							date_end: z.string().optional(),
+							location: z.string().optional(),
+							description: z.string().optional(),
+						})
+						.optional(),
+				).optional(),
 		})
 		.required();
 

@@ -53,6 +53,14 @@ export interface UserAccount extends Account {
 			name: string;
 			about: string;
 		}[];
+		experiences: {
+			employer: string;
+			position: string;
+			date_start: string;
+			date_end: string;
+			location: string;
+			description: string;
+		}[];
 	};
 }
 
@@ -120,6 +128,16 @@ const userAccountSchema = new Schema<UserAccount>({
 			{
 				name: { type: String, required: false },
 				about: { type: String, required: false },
+			},
+		],
+		experiences: [
+			{
+				employer: { type: String, required: false },
+				position: { type: String, required: false },
+				date_start: { type: String, required: false },
+				date_end: { type: String, required: false },
+				location: { type: String, required: false },
+				description: { type: String, required: false },
 			},
 		],
 	},
