@@ -1,29 +1,26 @@
-import { RequestExt, ResponseExt } from "../utils/types";
-import { isError, result } from "../utils/error";
-import { userAccountModel } from "../models/userAccount.model";
-import { userValidation } from "../validation/user.validation";
-import { firebaseStorage } from "../utils/firebase";
+import { RequestExt, ResponseExt } from '../utils/types';
+import { isError, result } from '../utils/error';
+import { userAccountModel } from '../models/userAccount.model';
+import { userValidation } from '../validation/user.validation';
+import { firebaseStorage } from '../utils/firebase';
+import { failResponse, successResponse } from '../utils/response';
 
 export async function getAllUsers(req: RequestExt, res: ResponseExt) {
 	const user = await result(userAccountModel.find());
 
 	if (isError(user))
-		return res
-			.status(404)
-			.json({ status: "error", message: "Could not return users " });
+		return failResponse(res, 404, 'Could not return users', user);
 
-	return res.status(200).json({ status: "sucsess", data: user });
+	return successResponse(res, 200, 'Succeded in returning users', user);
 }
 
 export async function getUserData(req: RequestExt, res: ResponseExt) {
 	const userId = req.session.uid;
 	const user = await result(userAccountModel.findOne({ uid: userId }));
 	if (isError(user))
-		return res
-			.status(404)
-			.json({ status: "error", message: "Could not return user " });
+		return failResponse(res, 404, 'Could not return user ', user);
 
-	return res.status(200).json({ status: "sucsess", data: user });
+	return successResponse(res, 200, 'Succeded in returning users', user);
 }
 
 export async function updateUserPicture(req: RequestExt, res: ResponseExt) {
@@ -34,24 +31,23 @@ export async function updateUserPicture(req: RequestExt, res: ResponseExt) {
 	const reqFile = req.files?.picture;
 
 	if (!reqFile)
-		return res.status(400).json({
-			status: "error",
-			message: "No files provided (submit with name 'picture')",
-		});
+		return failResponse(
+			res,
+			404,
+			"No files provided (submit with name 'picture')",
+		);
 
 	if (Array.isArray(reqFile))
-		return res.status(400).json({ status: "Submit only one file" });
+		return failResponse(res, 400, 'Submit only one file');
 
 	// validate picture
-	if (reqFile.mimetype !== "image/jpeg" && reqFile.mimetype !== "image/png")
-		return res
-			.status(400)
-			.json({ status: "error", message: "File in request is not a picture" });
+	if (reqFile.mimetype !== 'image/jpeg' && reqFile.mimetype !== 'image/png')
+		return failResponse(res, 400, 'File in request is not a picture');
 
 	// upload file to firebase
 
 	const firebaseLink = `users/${userId}/picture${
-		reqFile.mimetype === "image/jpeg" ? ".jpg" : ".png"
+		reqFile.mimetype === 'image/jpeg' ? '.jpg' : '.png'
 	}`;
 
 	const uploadResult = await result(
@@ -61,10 +57,7 @@ export async function updateUserPicture(req: RequestExt, res: ResponseExt) {
 	);
 
 	if (isError(uploadResult))
-		return res.status(404).json({
-			status: "error",
-			message: "Could not upload request file to firebase",
-		});
+		return failResponse(res, 404, 'Could not upload request file to firebase');
 
 	// update user data in database
 	const user = await result(
@@ -77,13 +70,9 @@ export async function updateUserPicture(req: RequestExt, res: ResponseExt) {
 	);
 
 	if (isError(user))
-		return res
-			.status(404)
-			.json({ status: "error", message: "Could not update user picture" });
+		return failResponse(res, 404, 'Could not update user picture');
 
-	return res
-		.status(200)
-		.json({ status: "success", message: "User picture updated" });
+	return successResponse(res, 200, 'User picture updated', user);
 }
 
 export async function updateUserData(req: RequestExt, res: ResponseExt) {
@@ -94,9 +83,7 @@ export async function updateUserData(req: RequestExt, res: ResponseExt) {
 	const validationResult = userValidation(req.body);
 
 	if (!validationResult.success)
-		return res
-			.status(400)
-			.json({ status: "Error", message: validationResult.error });
+		return failResponse(res, 400, `${validationResult.error}`);
 
 	const validData = validationResult.data;
 
@@ -111,11 +98,7 @@ export async function updateUserData(req: RequestExt, res: ResponseExt) {
 	);
 
 	if (isError(user))
-		return res
-			.status(404)
-			.json({ status: "error", message: "Could not update user data" });
+		return failResponse(res, 404, 'Could not update user data');
 
-	return res
-		.status(200)
-		.json({ status: "success", message: JSON.stringify(user) });
+	return successResponse(res, 404, JSON.stringify(user), user);
 }
