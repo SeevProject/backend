@@ -1,17 +1,16 @@
-import { companyAccountModel } from "../models/companyAccount.model";
-import { isError, result } from "../utils/error";
-import { RequestExt, ResponseExt } from "../utils/types";
-import { CompanyValidation } from "../validation/company.validation";
+import { companyAccountModel } from '../models/companyAccount.model';
+import { isError, result } from '../utils/error';
+import { failResponse, successResponse } from '../utils/response';
+import { RequestExt, ResponseExt } from '../utils/types';
+import { CompanyValidation } from '../validation/company.validation';
 
 export async function getAllCompanies(req: RequestExt, res: ResponseExt) {
 	const company = await result(companyAccountModel.find());
 
 	if (isError(company))
-		return res
-			.status(404)
-			.json({ status: "error", message: "Could not return companys data" });
+		return failResponse(res, 404, 'Could not return companys data', company);
 
-	return res.status(200).json({ status: "sucsess", data: company });
+	return successResponse(res, 200, 'Succeded in returning companys', company);
 }
 
 export async function approveCompany(req: RequestExt, res: ResponseExt) {
@@ -25,32 +24,30 @@ export async function approveCompany(req: RequestExt, res: ResponseExt) {
 
 	// if could not update, return error
 	if (isError(account))
-		return res
-			.status(500)
-			.json({ message: "Could not approve company account" });
+		return failResponse(res, 404, 'could not update,companys data');
 
 	// if could update, return success
-	return res.status(200).json({ message: "company account approved" });
+	return successResponse(res, 200, 'company account approved', account);
 }
 
 export async function getCompanyData(req: RequestExt, res: ResponseExt) {
 	const company = await result(companyAccountModel.findById(req.params.id));
 
 	if (isError(company))
-		return res
-			.status(404)
-			.json({ status: "error", message: "Could not return company data" });
+		return failResponse(res, 404, 'Could not return companys data');
 
-	return res.status(200).json({ status: "sucsess", data: company });
+	return successResponse(res, 200, 'Succeded in returning companys', company);
 }
 
 export async function updateCompanyData(req: RequestExt, res: ResponseExt) {
 	const validationResult = CompanyValidation(req.body);
 	// console.log(validationResult)
-	if(!validationResult.success)
-	  return res.status(400).json({status:"Error",message:validationResult.error})
+	if (!validationResult.success)
+		return res
+			.status(400)
+			.json({ status: 'Error', message: validationResult.error });
 
-	const validateData=validationResult.data.permissions
+	const validateData = validationResult.data.permissions;
 
 	const company = await result(
 		companyAccountModel.updateOne(
@@ -61,11 +58,9 @@ export async function updateCompanyData(req: RequestExt, res: ResponseExt) {
 		),
 	);
 	if (isError(company))
-		return res
-			.status(404)
-			.json({ status: "error", message: "Could not update company data" });
+		return failResponse(res, 404, 'Could not update company data');
 
-	return res.status(200).json({ status: "sucsess", data: company });
+	return successResponse(res, 200, 'Succeded in update companys', company);
 }
 
 export async function deleteCompany(req: RequestExt, res: ResponseExt) {
@@ -73,9 +68,7 @@ export async function deleteCompany(req: RequestExt, res: ResponseExt) {
 		companyAccountModel.findByIdAndDelete(req.params.id),
 	);
 	if (isError(company))
-		return res
-			.status(404)
-			.json({ status: "error", message: "Could not delete company data" });
+	      return failResponse(res, 404, 'Could not delete company data');
 
-	return res.status(200).json({ status: "sucsess", data: company });
+	return successResponse(res, 200, 'Succeded in delete companys', company);
 }
