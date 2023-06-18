@@ -20,7 +20,7 @@ export async function getAllTemplates(req: RequestExt, res: ResponseExt) {
 	const templateResult = await result(templateModel.find());
 
 	if (isError(templateResult))
-		return failResponse(res, 404, 'Failed to return templates', templateResult);
+		return failResponse(res, 500, "Failed to return templates", templateResult);
 
 	return successResponse(
 		res,
@@ -63,8 +63,8 @@ export async function addTemplate(req: RequestExt, res: ResponseExt) {
 	if (isError(templateReadFileResult))
 		return failResponse(
 			res,
-			404,
-			'Failed to read submitted file',
+			500,
+			"Failed to read submitted file",
 			templateReadFileResult,
 		);
 
@@ -82,8 +82,8 @@ export async function addTemplate(req: RequestExt, res: ResponseExt) {
 	if (isError(createResult))
 		return failResponse(
 			res,
-			404,
-			'Failed to add template to database',
+			500,
+			"Failed to add template to database",
 			createResult,
 		);
 
@@ -132,8 +132,8 @@ export async function updateTemplate(req: RequestExt, res: ResponseExt) {
 	if (isError(uploadResult))
 		return failResponse(
 			res,
-			404,
-			'Failed to upload submitted file',
+			500,
+			"Failed to upload submitted file",
 			uploadResult,
 		);
 
@@ -143,8 +143,8 @@ export async function updateTemplate(req: RequestExt, res: ResponseExt) {
 	if (isError(templateReadFileResult))
 		return failResponse(
 			res,
-			404,
-			'Failed to read submitted file',
+			500,
+			"Failed to read submitted file",
 			templateReadFileResult,
 		);
 
@@ -164,8 +164,8 @@ export async function updateTemplate(req: RequestExt, res: ResponseExt) {
 	if (isError(updateResult))
 		return failResponse(
 			res,
-			404,
-			'Failed to update template in db',
+			500,
+			"Failed to update template in db",
 			updateResult,
 		);
 
@@ -185,10 +185,20 @@ export async function deleteTemplate(req: RequestExt, res: ResponseExt) {
 	const templateData = await result(templateModel.findOne({ _id: templateId }));
 
 	if (isError(templateData))
-		return failResponse(res, 404, 'Could not perform search to delete');
+		return failResponse(
+			res,
+			500,
+			"",
+			templateData,
+			"Failed in searching for template data",
+		)
 
 	if (!templateData)
-		return failResponse(res, 404, 'Could not find template to delete');
+		return failResponse(
+			res,
+			404,
+			"Failed to find template",
+		)
 
 	// if a file is attached to a template
 	if (templateData.link) {
@@ -200,23 +210,27 @@ export async function deleteTemplate(req: RequestExt, res: ResponseExt) {
 		if (isError(deleteResult))
 			return failResponse(
 				res,
-				404,
-				'Could not delete template file from firebase',
-			);
+				500,
+				"",
+				deleteResult,
+				"Failed in deleting template file from firebase",
+			)
 	}
 	const deleteResult = await result(
 		templateModel.deleteOne({ _id: templateId }),
 	);
 
 	if (isError(deleteResult))
-		return failResponse(res, 404, 'Could not update template data');
+		return failResponse(
+			res, 500, "", deleteResult, "Failed in deleting template from db"
+		)
 
 	return successResponse(
 		res,
 		200,
-		'template deleted from db and firebase files',
-		templateData,
-	);
+		"Succeded in deleting template from db",
+		deleteResult,
+	)
 }
 
 export async function generateFromTemplate(req: RequestExt, res: ResponseExt) {
@@ -228,33 +242,50 @@ export async function generateFromTemplate(req: RequestExt, res: ResponseExt) {
 	const templateData = await result(templateModel.findOne({ _id: templateId }));
 
 	if (isError(templateData))
-			 return failResponse(res, 404, 'Could not find template');
+		return failResponse(
+			res,
+			500,
+			"",
+			templateData,
+			"Failed in searching for template data",
+		)
+
 
 	if (!templateData)
-	     return failResponse(res, 404, 'Could not find template');
+		return failResponse(
+			res, 404, "Failed to find template"
+		)
 
 	// SECTION: get user data from db
 
-	const user = await result(userAccountModel.findOne({ uid: req.session.uid }));
+	const userResult = await result(userAccountModel.findOne({ uid: req.session.uid }));
 
-	if (isError(user))
-		 return failResponse(res, 404, 'Could not look for user in db');
+	if (isError(userResult))
+		return failResponse(
+			res,
+			500,
+			"",
+			userResult,
+			"Failed in searching for user data",
+		)
 
-	if (!user)
-		return failResponse(res, 404, 'Could not find user in db');
+	if (!userResult)
+		return failResponse(
+			res, 404, "Failed to find user"
+		)
 
 	// SECTION: compare template data with user data
-	const flattenedData = flattenObject(user.toObject().data);
+	const flattenedData = flattenObject(userResult.toObject().data);
 
-	const problems = getCompatability(flattenedData, user.picture, templateData);
+	const problems = getCompatability(flattenedData, userResult.picture, templateData);
 
 	if (problems.length > 0)
 		return failResponse(
 			res,
 			400,
-			'User data and template are not compatible',
-			// problems
-		);
+			"User data and template are not compatible",
+			problems as any,
+		)
 
 	// SECTION: get template file from firebase storage
 
@@ -270,11 +301,20 @@ export async function generateFromTemplate(req: RequestExt, res: ResponseExt) {
 	if (isError(fileExists))
 		return failResponse(
 			res,
-			404,
-			'Could not use link to search for file in storage',
-		);
+			500,
+			"",
+			fileExists,
+			"Failed in checking if template file exists in storage",
+		)
+
 	if (!fileExists[0])
-		return failResponse(res, 404, 'Could not find file in storage');
+		return failResponse(
+			res,
+			500,
+			"",
+			undefined,
+			"Failed to find template file in storage",
+		)
 
 	// download file
 	const downloadResult = await result(templateFile.download());
@@ -282,27 +322,34 @@ export async function generateFromTemplate(req: RequestExt, res: ResponseExt) {
 	if (isError(downloadResult))
 		return failResponse(
 			res,
-			404,
-			`Could not download file from storage ${downloadResult.message}`,
-		);
+			500,
+			"",
+		 	downloadResult,
+			"Failed in downloading template file from storage",
+		)
+
 
 	const fileBuffer = downloadResult[0];
 
 	// SECTION: insert data into template and convert to pdf
 
 	// get user picture from firebase
-	const pictureFile = firebaseStorage.file(user.picture);
+	const pictureFile = firebaseStorage.file(userResult.picture);
 
 	// make file publicly available
 	const makePublicResult = await result(pictureFile.makePublic());
 
 	if (isError(makePublicResult))
-		return failResponse(res, 404, 'Could not make user picture public');
+		return failResponse(
+			res,
+			500,
+			"",
+		 	makePublicResult,
+		 	"Failed in making user picture public",
+		)
 
 	// get public link
 	const picturePublicLink = pictureFile.publicUrl();
-
-	console.log(picturePublicLink);
 
 	// read file as string for cheerio
 	const templateAsDocument = load(fileBuffer.toString());
@@ -321,7 +368,13 @@ export async function generateFromTemplate(req: RequestExt, res: ResponseExt) {
 	const makePrivateResult = await result(pictureFile.makePrivate());
 
 	if (isError(makePrivateResult))
-		return failResponse(res, 404, 'Could not make user picture private');
+		return failResponse(
+			res,
+			500,
+			"",
+		 	makePrivateResult,
+		 	"Failed in making user picture private",
+		)
 
 	// SECTION: upload pdf and add link to user data
 
@@ -333,7 +386,13 @@ export async function generateFromTemplate(req: RequestExt, res: ResponseExt) {
 	);
 
 	if (isError(uploadResult))
-		return failResponse(res, 404, 'Could not upload pdf');
+		return failResponse(
+			res,
+			500,
+			"",
+		 	uploadResult,
+		 	"Failed in uploading pdf to firebase",
+		)
 
 	// add link to user data in cv links
 	const userUpdateResult = await result(
@@ -345,17 +404,30 @@ export async function generateFromTemplate(req: RequestExt, res: ResponseExt) {
 	);
 
 	if (isError(userUpdateResult))
-		return failResponse(res, 404, 'Could not update user data');
+		return failResponse(
+			res,
+			500,
+			"",
+		 	userUpdateResult,
+		 	"Failed in updating user data",
+		)
 
 	// delete template file from tmp
 	const deleteResult = await result(rm(localLink));
 
 	if (isError(deleteResult))
-		return failResponse(
+		return successResponse(
 			res,
-			404,
-			'Successfully generated CV but could not delete file from tmp',
-		);
+			200,
+			"Successfully generated CV but could not delete file from tmp",
+			deleteResult,
+		)
+
 	// return successfull response
-	return successResponse(res, 200, 'Successfully generated cv', templateData);
+	return successResponse(
+		res,
+		200,
+		"Successfully generated CV",
+		userUpdateResult,
+	)
 }
