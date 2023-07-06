@@ -110,6 +110,71 @@ export async function register(req: RequestExt, res: ResponseExt) {
 	return res.send("successfully registered the account");
 }
 
+export async function loginOrRegister(req: RequestExt, res: ResponseExt) {
+	// token data is already added to the request by the previous middleware
+	const tokenData = req.tokenData;
+
+	// try to find user account in database
+	const account = await result(
+		accountModel.findOne({
+			uid: tokenData?.uid,
+		}),
+	);
+
+	// if got error while finding account, return error
+	if (isError(account))
+		return res
+			.status(401)
+			.json({ message: "Could not try to find if you already got an account" });
+
+	// if the account exists set session and return
+	if (account) {
+		req.session.uid = account.uid;
+		return res.status(200).json({ message: "successfully logged in" });
+	}
+
+	// else register the account
+
+	// validate req.body data and return error if not matching
+	const validationResult = validateRegister.safeParse(req.body);
+	if (!validationResult.success)
+		return res.status(400).json({ message: validationResult.error });
+
+	// use validated body data instead of req.body
+	const validBody = validationResult.data;
+
+	// create user account in database
+
+	let createdAccount;
+
+	if (validBody.type == "company") {
+		createdAccount = companyAccountModel.create({
+			uid: tokenData?.uid,
+			createdAt: new Date().toString(),
+			type: "company",
+			approved: false,
+		});
+	} else {
+		createdAccount = userAccountModel.create({
+			uid: tokenData?.uid,
+			createdAt: new Date().toString(),
+			type: "user",
+			cvlist: [],
+		});
+	}
+
+	// if could not create account, return error
+	if (isError(createdAccount))
+		return res
+			.status(401)
+			.json({ message: "Could not create your account in db" });
+
+	// finally create session using uid retrieved from database
+	req.session.uid = "";
+
+	return res.send("successfully registered the account");
+}
+
 export async function logout(req: RequestExt, res: ResponseExt) {
 	// delete session for user
 	req.session.destroy((err) => {

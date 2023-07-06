@@ -1,13 +1,13 @@
 import { Schema, Document, model } from "mongoose";
 
 export interface Account extends Document {
-	username: string;
+	username?: string;
 	uid: string;
 	createdAt: Date;
 }
 
 const accountSchema = new Schema<Account>({
-	username: { type: String, required: true },
+	username: { type: String, required: false },
 	uid: { type: String, required: true },
 	createdAt: { type: Date, required: true, default: Date.now },
 });
