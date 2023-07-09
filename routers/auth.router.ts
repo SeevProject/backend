@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { login, logout, register } from "../controllers/auth.controller";
+import { login, loginOrRegister, logout, register } from "../controllers/auth.controller";
 import {
 	requiresSession,
 	requiresNoSession,
@@ -9,6 +9,7 @@ import {
 export const authRouter = Router();
 
 authRouter
-	.post("/login", requiresNoSession, requiresToken, login)
-	.post("/register", requiresNoSession, requiresToken, register)
-	.post("/logout", requiresSession, logout);
+	.post('/login', requiresNoSession, requiresToken, login)
+	.post('/loginwithgoogle', requiresNoSession, requiresToken, loginOrRegister)
+	.post('/register', requiresNoSession, requiresToken, register)
+	.post('/logout', requiresSession, logout);

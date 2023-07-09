@@ -1,5 +1,6 @@
 import { Router } from "express";
 import {
+	deleteUser,
 	getAllUsers,
 	getUserData,
 	updateUserData,
@@ -15,4 +16,5 @@ usersRouter
 	.get("/me", requiresSession, getUserData)
 	.put("/me/data", requiresSession, updateUserData)
 	.put("/me/picture", requiresSession, updateUserPicture)
-	.get("/", requiresSession, requiresAdmin, getAllUsers);
+	.get("/", requiresSession, requiresAdmin, getAllUsers)
+	.delete("/:id", requiresSession, requiresAdmin, deleteUser);

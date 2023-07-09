@@ -102,3 +102,13 @@ export async function updateUserData(req: RequestExt, res: ResponseExt) {
 
 	return successResponse(res, 404, JSON.stringify(user), user);
 }
+
+export const deleteUser = async (req, res) => {
+	console.log("delete")
+		const id = req.params.id;
+		const user = await result(userAccountModel.findByIdAndDelete(id));
+	if (isError(user))
+		return failResponse(res, 404, 'Could not return users', user);
+
+	return successResponse(res, 200, 'Succeded in returning users', user);
+};

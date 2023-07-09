@@ -1,27 +1,28 @@
-import express from "express";
-import { connectDB } from "./utils/mongo";
-import cors from "cors";
-import helmet from "helmet";
-import { usersRouter } from "./routers/users.router";
-import { templatesRouter } from "./routers/templates.router";
-import { authRouter } from "./routers/auth.router";
-import { companiesRouter } from "./routers/companies.router";
-import mongoStore from "connect-mongo";
-import session from "express-session";
-import { rateLimit } from "express-rate-limit";
-import { loadEnv } from "./utils/env";
-import { env } from "./utils/env";
-import fileUpload from "express-fileupload";
-import expressRequestsLogger from "express-requests-logger";
+import express from 'express';
+import { connectDB } from './utils/mongo';
+import cors from 'cors';
+import helmet from 'helmet';
+import { usersRouter } from './routers/users.router';
+import { templatesRouter } from './routers/templates.router';
+import { authRouter } from './routers/auth.router';
+import { companiesRouter } from './routers/companies.router';
+import mongoStore from 'connect-mongo';
+import session from 'express-session';
+import { rateLimit } from 'express-rate-limit';
+import { loadEnv } from './utils/env';
+import { env } from './utils/env';
+import fileUpload from 'express-fileupload';
+import expressRequestsLogger from 'express-requests-logger';
 
 // import env variables
 loadEnv();
 
 // connect to the database
-connectDB(env.MONGO_URL || "");
+connectDB(env.MONGO_URL || '');
 
 // create app
 const app = express();
+
 
 // add middlware to app
 app.use(
@@ -33,10 +34,15 @@ app.use(
 	helmet(),
 
 	// cors for cross origin
+	// cors({
+	// 	credentials: true,
+	// 	origin: env.DEV ? "*" : "https://seev-backend.ahmed.systems/",
+	// 	methods: ["GET", "POST", "PUT", "DELETE"],
+	// }),
+
 	cors({
+		origin: ['http://localhost:5174', 'http://localhost:5173'],
 		credentials: true,
-		origin: env.DEV ? "*" : "https://seev-backend.ahmed.systems/",
-		methods: ["GET", "POST", "PUT", "DELETE"],
 	}),
 
 	// setup rate limiter for requests
@@ -51,16 +57,16 @@ app.use(
 	// session for cookies
 	session({
 		// TODO set proper secret
-		secret: "hello",
+		secret: 'hello',
 		saveUninitialized: false,
 		resave: false,
 		store: mongoStore.create({
-			mongoUrl: env.MONGO_URL || "",
-			dbName: "testing",
+			mongoUrl: env.MONGO_URL || '',
+			dbName: 'testing',
 		}),
 		cookie: {
 			httpOnly: true,
-			sameSite: "lax",
+			sameSite: 'lax',
 			maxAge: 1000 * 60 * 60 * 24 * 3,
 			secure: false,
 		},
@@ -85,15 +91,17 @@ const PORT = env.PORT || 3000;
 
 // add routers to app
 // all require auth except auth itself
-app.use("/auth", authRouter);
-app.use("/users", usersRouter);
-app.use("/templates", templatesRouter);
-app.use("/companies", companiesRouter);
+app.use('/auth', authRouter);
+app.use('/users', usersRouter);
+app.use('/templates', templatesRouter);
+app.use('/companies', companiesRouter);
 
 // all other routes will return 404
-app.all("*", (_, res) => {
-	return res.status(404).send("Not Found");
+app.all('*', (_, res) => {
+	return res.status(404).send('Not Found');
 });
+
+
 
 // serve app
 app.listen(PORT, () => {

@@ -38,7 +38,14 @@ export async function getCompanyData(req: RequestExt, res: ResponseExt) {
 
 	return successResponse(res, 200, 'Succeded in returning companys', company);
 }
+export async function getUsercompany(req: RequestExt, res: ResponseExt) {
+	const userId = req.session.uid;
+	const user = await result(companyAccountModel.findOne({ uid: userId }));
+	if (isError(user))
+		return failResponse(res, 404, 'Could not return user ', user);
 
+	return successResponse(res, 200, 'Succeded in returning users', user);
+}
 export async function updateCompanyData(req: RequestExt, res: ResponseExt) {
 	const validationResult = CompanyValidation(req.body);
 	// console.log(validationResult)
