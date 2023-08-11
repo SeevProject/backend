@@ -4,6 +4,7 @@ import { userAccountModel } from '../models/userAccount.model';
 import { userValidation } from '../validation/user.validation';
 import { firebaseStorage } from '../utils/firebase';
 import { failResponse, successResponse } from '../utils/response';
+import { accountModel } from '../models/account.model';
 
 export async function getAllUsers(req: RequestExt, res: ResponseExt) {
 	const user = await result(userAccountModel.find());
@@ -22,7 +23,14 @@ export async function getUserData(req: RequestExt, res: ResponseExt) {
 
 	return successResponse(res, 200, 'Succeded in returning users', user);
 }
+export async function getUserOrAdminData(req: RequestExt, res: ResponseExt) {
+	const userId = req.session.uid;
+	const user = await result(accountModel.findOne({ uid: userId }));
+	if (isError(user))
+		return failResponse(res, 404, 'Could not return user ', user);
 
+	return successResponse(res, 200, 'Succeded in returning users', user);
+}
 export async function updateUserPicture(req: RequestExt, res: ResponseExt) {
 	// get user id from session
 	const userId = req.session.uid;

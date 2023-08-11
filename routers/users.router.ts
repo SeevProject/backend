@@ -3,6 +3,7 @@ import {
 	deleteUser,
 	getAllUsers,
 	getUserData,
+	getUserOrAdminData,
 	updateUserData,
 	updateUserPicture,
 } from "../controllers/users.controller";
@@ -13,8 +14,9 @@ export const usersRouter = Router();
 // all routes require a session
 
 usersRouter
-	.get("/me", requiresSession, getUserData)
-	.put("/me/data", requiresSession, updateUserData)
-	.put("/me/picture", requiresSession, updateUserPicture)
-	.get("/", requiresSession, requiresAdmin, getAllUsers)
-	.delete("/:id", requiresSession, requiresAdmin, deleteUser);
+	.get('/me', requiresSession, getUserData)
+	.get('/meBoth', requiresSession, getUserOrAdminData)
+	.put('/me/data', requiresSession, updateUserData)
+	.put('/me/picture', requiresSession, updateUserPicture)
+	.get('/', requiresSession, requiresAdmin, getAllUsers)
+	.delete('/:id', requiresSession, requiresAdmin, deleteUser);
