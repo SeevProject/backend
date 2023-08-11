@@ -13,6 +13,7 @@ import { loadEnv } from './utils/env';
 import { env } from './utils/env';
 import fileUpload from 'express-fileupload';
 import expressRequestsLogger from 'express-requests-logger';
+import { adminRouter } from './routers/admin.route';
 
 // import env variables
 loadEnv();
@@ -95,6 +96,8 @@ app.use('/auth', authRouter);
 app.use('/users', usersRouter);
 app.use('/templates', templatesRouter);
 app.use('/companies', companiesRouter);
+app.use('/admin', adminRouter);
+
 
 // all other routes will return 404
 app.all('*', (_, res) => {

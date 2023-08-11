@@ -5,6 +5,7 @@ import { accountModel } from '../models/account.model';
 import { validateRegister } from '../validation/auth.validation';
 import { companyAccountModel } from '../models/companyAccount.model';
 import { failResponse, successResponse } from '../utils/response';
+import { adminAccountModel } from '../models/adminAccount.model';
 
 export async function login(req: RequestExt, res: ResponseExt) {
 	// token data is already added to the request by the previous middleware
@@ -13,7 +14,7 @@ export async function login(req: RequestExt, res: ResponseExt) {
 	// try to find account in database
 	const account = await result(
 		// accountModel will search in all account types
-		accountModel.findOne({
+		adminAccountModel.findOne({
 			// use uid from token
 			uid: tokenData?.uid,
 		}),

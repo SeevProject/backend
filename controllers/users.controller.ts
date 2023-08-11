@@ -23,14 +23,7 @@ export async function getUserData(req: RequestExt, res: ResponseExt) {
 
 	return successResponse(res, 200, 'Succeded in returning users', user);
 }
-export async function getUserOrAdminData(req: RequestExt, res: ResponseExt) {
-	const userId = req.session.uid;
-	const user = await result(accountModel.findOne({ uid: userId }));
-	if (isError(user))
-		return failResponse(res, 404, 'Could not return user ', user);
 
-	return successResponse(res, 200, 'Succeded in returning users', user);
-}
 export async function updateUserPicture(req: RequestExt, res: ResponseExt) {
 	// get user id from session
 	const userId = req.session.uid;

@@ -3,7 +3,6 @@ import {
 	deleteUser,
 	getAllUsers,
 	getUserData,
-	getUserOrAdminData,
 	updateUserData,
 	updateUserPicture,
 } from "../controllers/users.controller";
@@ -15,7 +14,6 @@ export const usersRouter = Router();
 
 usersRouter
 	.get('/me', requiresSession, getUserData)
-	.get('/meBoth', requiresSession, getUserOrAdminData)
 	.put('/me/data', requiresSession, updateUserData)
 	.put('/me/picture', requiresSession, updateUserPicture)
 	.get('/', requiresSession, requiresAdmin, getAllUsers)
