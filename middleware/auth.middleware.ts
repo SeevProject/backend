@@ -4,6 +4,7 @@ import { firebaseAdmin } from "../utils/firebase";
 import { RequestExt, ResponseExt } from "../utils/types";
 import { adminAccountModel } from "../models/adminAccount.model";
 import { env, loadEnv } from "../utils/env";
+import { companyAccountModel } from "../models/companyAccount.model";
 
 // load environments
 loadEnv();
@@ -96,6 +97,35 @@ export async function requiresAdmin(
 	// if the account is not an admin, return error
 	if (!adminAccount)
 		return res.status(401).json({ message: "You're not an admin" });
+
+	next();
+}
+export async function requiresCompanyAndadmin(
+	req: RequestExt,
+	res: ResponseExt,
+	next: NextFunction,
+) {
+	// try to find admin account with session uid
+	const companyAccount = await result(
+		companyAccountModel.findOne({
+			uid: req.session.uid,
+		}),
+	);
+	const adminAccount = await result(
+		adminAccountModel.findOne({
+			uid: req.session.uid,
+		}),
+	);
+
+	// if got error while finding account, return error
+	if (isError(adminAccount) && isError(companyAccount))
+		return res
+			.status(401)
+			.json({ message: 'Could not try to find if you are an admin and company' });
+
+	// if the account is not an admin, return error
+	if (!adminAccount && !companyAccount)
+		return res.status(401).json({ message: "You're not an admin and company" });
 
 	next();
 }

@@ -14,6 +14,16 @@ export async function getAllUsers(req: RequestExt, res: ResponseExt) {
 
 	return successResponse(res, 200, 'Succeded in returning users', user);
 }
+export async function getUsersById(req: RequestExt, res: ResponseExt) {
+	const id = req.params.id;
+	const user = await result(userAccountModel.findById(id));
+
+	if (isError(user))
+		return failResponse(res, 404, 'Could not return users', user);
+
+	return successResponse(res, 200, 'Succeded in returning users', user);
+}
+
 
 export async function getUserData(req: RequestExt, res: ResponseExt) {
 	const userId = req.session.uid;
